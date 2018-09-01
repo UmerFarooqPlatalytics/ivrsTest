@@ -102,32 +102,29 @@ object RmDump {
 
     val dataToWrite = sparkSession.sqlContext.applySchema(sparkSession.sparkContext.parallelize(rddToWrite.toList), outputSchema)
 
-    
     dataToWrite.createOrReplaceTempView("table")
     val result = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NULL
+      select * from table where IVRS_PATIENT_ID IS NOT NULL
       
       """)
-      println("========= THE COUNT =========")
-      println(result.count)
-      result.show
-      
-      
+    println("========= THE COUNT =========")
+    println(result.count)
+    result.show
 
-//        var prop = new java.util.Properties
-//        val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
-//        prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
-//        prop.setProperty("user", "S_NUMTRA")
-//        prop.setProperty("password", "numtradatasci#2018")
-//        prop.setProperty("allowExisting", "true")
-//    
-//        dataToWrite.write.mode(SaveMode.Append)
-//          .format("jdbc")
-//          .option("url", url)
-//          .option("user", "S_NUMTRA")
-//          .option("password", "numtradatasci#2018")
-//          .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-//          .save()
+    var prop = new java.util.Properties
+    val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+    prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
+    prop.setProperty("user", "S_NUMTRA")
+    prop.setProperty("password", "numtradatasci#2018")
+    prop.setProperty("allowExisting", "true")
+
+    result.write.mode(SaveMode.Append)
+      .format("jdbc")
+      .option("url", url)
+      .option("user", "S_NUMTRA")
+      .option("password", "numtradatasci#2018")
+      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+      .save()
 
     //dataToWrite
   }
