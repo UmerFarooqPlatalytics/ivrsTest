@@ -103,22 +103,29 @@ object RmDump {
     val dataToWrite = sparkSession.sqlContext.applySchema(sparkSession.sparkContext.parallelize(rddToWrite.toList), outputSchema)
 
     dataToWrite.createOrReplaceTempView("table")
-    val result = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NOT NULL
-      
-      """)
-    println("========= THE COUNT =========")
-    println(result.count)
-    result.show
-
     var prop = new java.util.Properties
     val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
     prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
     prop.setProperty("user", "S_NUMTRA")
     prop.setProperty("password", "numtradatasci#2018")
     prop.setProperty("allowExisting", "false")
+    val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
+    outputTable.createOrReplaceTempView("outputTable")
+    val rawData = sparkSession.sqlContext.sql("""
+      select * from table where IVRS_PATIENT_ID IS NOT NULL
+      
+      """)
 
-    result.write.mode(SaveMode.Append)
+    rawData.createOrReplaceTempView("newTable")
+    val updateDF = sparkSession.sqlContext.sql("""select newTable.* 
+      from outputTable join newTable 
+      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
+      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
+      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
+
+    val result = outputTable.except(updateDF).union(rawData)
+
+    result.write.mode(SaveMode.Overwrite)
       .format("jdbc")
       .option("url", url)
       .option("user", "S_NUMTRA")
