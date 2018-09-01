@@ -116,7 +116,7 @@ object RmDump {
     prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
     prop.setProperty("user", "S_NUMTRA")
     prop.setProperty("password", "numtradatasci#2018")
-    prop.setProperty("allowExisting", "true")
+    prop.setProperty("allowExisting", "false")
 
     result.write.mode(SaveMode.Append)
       .format("jdbc")
