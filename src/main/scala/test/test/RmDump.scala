@@ -104,10 +104,15 @@ object RmDump {
 
     
     dataToWrite.createOrReplaceTempView("table")
-    sparkSession.sqlContext.sql("""
+    val result = sparkSession.sqlContext.sql("""
       select * from table where IVRS_PATIENT_ID IS NULL
       
-      """).show
+      """)
+      println("========= THE COUNT =========")
+      println(result.count)
+      result.show
+      
+      
 
 //        var prop = new java.util.Properties
 //        val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
