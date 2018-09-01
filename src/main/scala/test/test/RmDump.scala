@@ -47,7 +47,6 @@ object RmDump {
       }
 
       val noneCheck = (value: Option[String]) => {
-        println(value)
         if (value != None)
           value.get
         else
@@ -103,7 +102,12 @@ object RmDump {
 
     val dataToWrite = sparkSession.sqlContext.applySchema(sparkSession.sparkContext.parallelize(rddToWrite.toList), outputSchema)
 
-    dataToWrite.show
+    
+    dataToWrite.createOrReplaceTempView("table")
+    sparkSession.sqlContext.sql("""
+      select * from table where IVRS_PATIENT_ID = NULL
+      
+      """)
 
     //    var prop = new java.util.Properties
     //    val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
