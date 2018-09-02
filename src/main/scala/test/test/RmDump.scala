@@ -126,7 +126,7 @@ object RmDump {
     outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("forResult")
 
     val result = sparkSession.sqlContext.sql("""
-      SELECT *, null as MATCH_RANK
+      SELECT *, NULL as MATCH_RANK
       FROM forResult
       """)
     
