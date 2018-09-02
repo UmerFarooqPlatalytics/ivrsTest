@@ -123,8 +123,13 @@ object RmDump {
       outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
       outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
 
-    val result = outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData)
+    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("forResult")
 
+    val result = sparkSession.sqlContext.sql("""
+      SELECT *, null as MATCH_RANK
+      FROM forResult
+      """)
+    
     result.write.mode(SaveMode.Overwrite)
       .format("jdbc")
       .option("url", url)
