@@ -115,7 +115,7 @@ object RmDump {
       select * from table where IVRS_PATIENT_ID IS NOT NULL
       """)
 
-//    rawData.show
+    //    rawData.show
 
     rawData.createOrReplaceTempView("newTable")
     val updateDF = sparkSession.sqlContext.sql("""select newTable.* 
@@ -124,17 +124,17 @@ object RmDump {
       outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
       outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
 
-      updateDF.show
-      
-//    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("forResult")
-//
-//    val result = sparkSession.sqlContext.sql("""
-//      SELECT *, NULL as MATCH_RANK
-//      FROM forResult
-//      WHERE IVRS_PATIENT_F_INITIAL = 'US'
-//      """)
-//
-//   result.show
+    //updateDF.show
+
+    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
+    //
+    //    val result = sparkSession.sqlContext.sql("""
+    //      SELECT *, NULL as MATCH_RANK
+    //      FROM forResult
+    //      WHERE IVRS_PATIENT_F_INITIAL = 'US'
+    //      """)
+    //
+    //   result.show
 
     //    result.write.mode(SaveMode.Overwrite)
     //      .format("jdbc")
