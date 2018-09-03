@@ -112,26 +112,28 @@ object RmDump {
     val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
     outputTable.createOrReplaceTempView("outputTable")
     val rawData = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NOT NULL
+      select * from table where IVRS_PATIENT_ID IS NOT NULL AND IVRS_PATIENT_F_INITIAL = 'US'
       
       """)
 
-    rawData.createOrReplaceTempView("newTable")
-    val updateDF = sparkSession.sqlContext.sql("""select newTable.* 
-      from outputTable join newTable 
-      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
-      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
-      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
-
-    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("forResult")
-
-    val result = sparkSession.sqlContext.sql("""
-      SELECT *, NULL as MATCH_RANK
-      FROM forResult
-      WHERE IVRS_PATIENT_F_INITIAL = 'US'
-      """)
-
-    result.show
+     rawData.show 
+      
+//    rawData.createOrReplaceTempView("newTable")
+//    val updateDF = sparkSession.sqlContext.sql("""select newTable.* 
+//      from outputTable join newTable 
+//      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
+//      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
+//      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
+//
+//    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("forResult")
+//
+//    val result = sparkSession.sqlContext.sql("""
+//      SELECT *, NULL as MATCH_RANK
+//      FROM forResult
+//      WHERE IVRS_PATIENT_F_INITIAL = 'US'
+//      """)
+//
+//    result.show
 
     //    result.write.mode(SaveMode.Overwrite)
     //      .format("jdbc")
