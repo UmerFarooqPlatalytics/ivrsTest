@@ -126,7 +126,14 @@ object RmDump {
 
     //updateDF.show
 
-    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
+    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData.except(updateDF)).createGlobalTempView("oneMore")
+    sparkSession.sqlContext.sql("""
+      SELECT *, NULL as MATCH_RANK
+      FROM oneMore
+      WHERE IVRS_PATIENT_F_INITIAL = 'US'
+      
+      """).show
+    //outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").show//.except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
     //
     //    val result = sparkSession.sqlContext.sql("""
     //      SELECT *, NULL as MATCH_RANK
