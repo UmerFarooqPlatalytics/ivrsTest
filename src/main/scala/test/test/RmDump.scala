@@ -112,7 +112,7 @@ object RmDump {
     val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
     outputTable.createOrReplaceTempView("outputTable")
     val rawData = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NOT NULL AND IVRS_PATIENT_F_INITIAL = 'US'
+      select * from outputTable where IVRS_PATIENT_ID IS NOT NULL AND IVRS_PATIENT_F_INITIAL = 'US'
       
       """)
 
