@@ -127,18 +127,14 @@ object RmDump {
     //updateDF.show
 
     outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
-    sparkSession.sqlContext.sql("""
+    val part1 = sparkSession.sqlContext.sql("""
       SELECT *
       FROM t1
-      WHERE IVRS_PATIENT_F_INITIAL = 'US'
-      
-      """).show
-    sparkSession.sqlContext.sql("""
+      """)
+    val part2 = sparkSession.sqlContext.sql("""
       SELECT *
       FROM newTable
-      WHERE IVRS_PATIENT_F_INITIAL = 'US'
-      
-      """).show
+      """)
 
     //outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").show//.except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
     //
@@ -150,13 +146,21 @@ object RmDump {
     //
     //   result.show
 
-    //    result.write.mode(SaveMode.Overwrite)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
+    part1.write.mode(SaveMode.Overwrite)
+      .format("jdbc")
+      .option("url", url)
+      .option("user", "S_NUMTRA")
+      .option("password", "numtradatasci#2018")
+      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+      .save()
+
+    part2.write.mode(SaveMode.Append)
+      .format("jdbc")
+      .option("url", url)
+      .option("user", "S_NUMTRA")
+      .option("password", "numtradatasci#2018")
+      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+      .save()
 
     //dataToWrite
   }
