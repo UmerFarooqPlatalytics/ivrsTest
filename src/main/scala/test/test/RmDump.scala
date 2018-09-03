@@ -132,7 +132,7 @@ object RmDump {
       FROM t1
       """)
     val part2 = sparkSession.sqlContext.sql("""
-      SELECT *
+      SELECT *, NULL as MATCH_RANK
       FROM newTable
       """)
 
