@@ -56,7 +56,7 @@ object RmDump {
       val toDouble = (value: String) => {
         if (value != null){
           println(value)
-          new java.math.BigDecimal(value, MathContext.DECIMAL64)
+          new java.math.BigDecimal(value.replace("-", ""), MathContext.DECIMAL64)
         }
         else
           null
