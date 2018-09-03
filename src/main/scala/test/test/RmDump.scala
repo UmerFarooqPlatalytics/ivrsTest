@@ -129,14 +129,16 @@ object RmDump {
       SELECT *, NULL as MATCH_RANK
       FROM forResult
       """)
-    
-    result.write.mode(SaveMode.Overwrite)
-      .format("jdbc")
-      .option("url", url)
-      .option("user", "S_NUMTRA")
-      .option("password", "numtradatasci#2018")
-      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-      .save()
+
+    result.show
+
+    //    result.write.mode(SaveMode.Overwrite)
+    //      .format("jdbc")
+    //      .option("url", url)
+    //      .option("user", "S_NUMTRA")
+    //      .option("password", "numtradatasci#2018")
+    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+    //      .save()
 
     //dataToWrite
   }
