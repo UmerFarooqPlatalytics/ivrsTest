@@ -126,7 +126,7 @@ object RmDump {
 
     //updateDF.show
 
-    outputTable.drop("CREATE_DATE").except(updateDF).drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
+    outputTable.except(updateDF).drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
     sparkSession.sqlContext.sql("""
       SELECT *
       FROM oneMore
