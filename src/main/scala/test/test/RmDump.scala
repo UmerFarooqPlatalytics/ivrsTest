@@ -119,14 +119,14 @@ object RmDump {
 
     rawData.createOrReplaceTempView("newTable")
     val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
-      from outputTable inner join newTable 
+      from outputTable join newTable 
       on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
       outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
       outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
 
     //updateDF.show
 
-    outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").except(updateDF).union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
+    outputTable.drop("CREATE_DATE").except(updateDF).drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
     sparkSession.sqlContext.sql("""
       SELECT *
       FROM oneMore
