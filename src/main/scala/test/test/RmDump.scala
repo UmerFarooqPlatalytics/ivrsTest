@@ -111,32 +111,33 @@ object RmDump {
     prop.setProperty("allowExisting", "false")
     val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
     outputTable.createOrReplaceTempView("outputTable")
-    val rawData = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NOT NULL
-      """)
+    outputTable.schema.fields.foreach(println)
+//    val rawData = sparkSession.sqlContext.sql("""
+//      select * from table where IVRS_PATIENT_ID IS NOT NULL
+//      """)
+//
+//    //    rawData.show
+//
+//    rawData.createOrReplaceTempView("newTable")
+//    val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
+//      from outputTable join newTable 
+//      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
+//      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
+//      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
+//
+//    //updateDF.show
+//
+//    outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
+//    val part1 = sparkSession.sqlContext.sql("""
+//      SELECT *
+//      FROM t1
+//      """)
+//    val part2 = sparkSession.sqlContext.sql("""
+//      SELECT *
+//      FROM newTable
+//      """)
 
-    //    rawData.show
-
-    rawData.createOrReplaceTempView("newTable")
-    val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
-      from outputTable join newTable 
-      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
-      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
-      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
-
-    //updateDF.show
-
-    outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
-    val part1 = sparkSession.sqlContext.sql("""
-      SELECT *
-      FROM t1
-      """)
-    val part2 = sparkSession.sqlContext.sql("""
-      SELECT *
-      FROM newTable
-      """)
-
-    part2.show
+    //part2.show
 
     //outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").show//.except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
     //
@@ -148,21 +149,21 @@ object RmDump {
     //
     //   result.show
 
-    //    part1.write.mode(SaveMode.Overwrite)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
-    //
-    //    part2.write.mode(SaveMode.Append)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
+//    part1.write.mode(SaveMode.Overwrite)
+//      .format("jdbc")
+//      .option("url", url)
+//      .option("user", "S_NUMTRA")
+//      .option("password", "numtradatasci#2018")
+//      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+//      .save()
+//
+//    part2.write.mode(SaveMode.Append)
+//      .format("jdbc")
+//      .option("url", url)
+//      .option("user", "S_NUMTRA")
+//      .option("password", "numtradatasci#2018")
+//      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+//      .save()
 
     //dataToWrite
   }
