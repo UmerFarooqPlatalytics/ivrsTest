@@ -128,6 +128,7 @@ object RmDump {
     val result = sparkSession.sqlContext.sql("""
       SELECT *, NULL as MATCH_RANK
       FROM forResult
+      WHERE IVRS_PATIENT_F_INITIAL = 'US'
       """)
 
     result.show
