@@ -139,8 +139,8 @@ object RmDump {
       FROM newTable
       """)
 
-    part1.show
-    part2.show
+    //    part1.show
+    //    part2.show
 
     //outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").show//.except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
     //
@@ -152,21 +152,21 @@ object RmDump {
     //
     //   result.show
 
-    //    part1.write.mode(SaveMode.Overwrite)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
-    //
-    //    part2.write.mode(SaveMode.Append)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
+    part1.write.mode(SaveMode.Overwrite)
+      .format("jdbc")
+      .option("url", url)
+      .option("user", "S_NUMTRA")
+      .option("password", "numtradatasci#2018")
+      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+      .save()
+
+    part2.write.mode(SaveMode.Append)
+      .format("jdbc")
+      .option("url", url)
+      .option("user", "S_NUMTRA")
+      .option("password", "numtradatasci#2018")
+      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+      .save()
 
     //dataToWrite
   }
