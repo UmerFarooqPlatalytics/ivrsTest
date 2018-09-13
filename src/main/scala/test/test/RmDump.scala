@@ -29,8 +29,8 @@ object RmDump {
     val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
 
     val facilityQuery = s"""
-          SELECT ss1.facility_cd, ss1.site_num 
-          FROM  s_site.study_site as ss1 , s_site.study_site as ss2"""
+          SELECT * 
+          FROM  s_site.study_site"""
 //          WHERE ss1.study_id in ('148') AND 
 //          ss1.facility_cd = ss2.facility_cd AND 
 //          ss1.study_id = ss2.study_id AND 
