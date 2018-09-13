@@ -13,6 +13,9 @@ import play.api.libs.json.Json
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.SaveMode
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.PreparedStatement
 
 object RmDump {
 
@@ -20,7 +23,26 @@ object RmDump {
     .master("local[*]").appName("test").getOrCreate
 
   def main(args: Array[String]) {
-    dumpIntoRm
+    //    dumpIntoRm
+
+    var prop = new java.util.Properties
+    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+
+    val facilityQuery = s"""
+          SELECT ss1.facility_cd, ss1.site_num 
+          FROM  s_site.study_site ss1 , s_site.study_site ss2
+          WHERE ss1.study_id in ('148') AND 
+          ss1.facility_cd = ss2.facility_cd AND 
+          ss1.study_id = ss2.study_id AND 
+          ss2.site_num in ('216')
+      """
+
+    var facMap = scala.collection.immutable.Map.empty[String, String]
+    val facilityDf = sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).rdd.
+      foreach(record => {
+        if (record.getAs[String](1) != null && record.getAs[String](0) != null)
+          facMap += (record.getAs[String](1) -> record.getAs[String](0))
+      })
   }
 
   def dumpIntoRm() = {
@@ -54,11 +76,10 @@ object RmDump {
       }
 
       val toDouble = (value: String) => {
-        if (value != null){
+        if (value != null) {
           println(value)
           new java.math.BigDecimal(value.replace("-", ""), MathContext.DECIMAL64)
-        }
-        else
+        } else
           null
       }
 
@@ -107,6 +128,11 @@ object RmDump {
     dataToWrite.createOrReplaceTempView("table")
     var prop = new java.util.Properties
     val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+
+    val dbc: Connection = DriverManager.getConnection(url)
+    val st: PreparedStatement = dbc.prepareStatement("YOUR PREPARED STATEMENT")
+    st.execute
+
     prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
     prop.setProperty("user", "S_NUMTRA")
     prop.setProperty("password", "numtradatasci#2018")

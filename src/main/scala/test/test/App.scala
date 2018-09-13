@@ -27,12 +27,19 @@ object App {
   //  var dinput: DataInput = _
   def main(args: Array[String]) {
     
-    sparkSession.sqlContext.read
-      .format("com.databricks.spark.csv")
-      .option("inferSchema", "false")
-      .option("header", "true")
-      .option("delimiter", ",")
-      .load("file:///C:/Users/umer/Downloads/3017-M16_100-US-20180828.csv").show
+    import sparkSession.sqlContext.implicits._
+    val df = sparkSession.sparkContext.parallelize(Array((1, 2), (3, 4), (1, 6))).toDF("age", "salary")
+    
+    val t = df.select(df("age")).distinct.collect.map(_.toSeq.mkString).mkString(",")
+    println(t)
+    
+    
+//    sparkSession.sqlContext.read
+//      .format("com.databricks.spark.csv")
+//      .option("inferSchema", "false")
+//      .option("header", "true")
+//      .option("delimiter", ",")
+//      .load("file:///C:/Users/umer/Downloads/3017-M16_100-US-20180828.csv").show
 
 //    val mongoCon = new MongoDBConnector
 //    mongoCon.connect("172.16.248.23", "9876")
