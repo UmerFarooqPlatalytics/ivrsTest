@@ -26,7 +26,7 @@ object RmDump {
     //    dumpIntoRm
 
     var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_users.acurian.com")
+    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
 
 //    val facilityQuery = s"""
 //          SELECT * 
@@ -43,7 +43,7 @@ object RmDump {
           WHERE ss1.study_id in ('148') AND 
           ss1.facility_cd = ss2.facility_cd AND 
           ss1.study_id = ss2.study_id AND 
-          ss2.site_num in ('216'))
+          ss2.site_num in ('216') )
       """
 
     var facMap = scala.collection.immutable.Map.empty[String, String]
