@@ -37,14 +37,7 @@ object RmDump {
 ////          ss2.site_num in ('216')"""
     
     
-    val facilityQuery = s"""
-          (SELECT ss1.facility_cd, ss1.site_num 
-          FROM  s_site.study_site as ss1 , s_site.study_site as ss2
-          WHERE ss1.study_id in ('148') AND 
-          ss1.facility_cd = ss2.facility_cd AND 
-          ss1.study_id = ss2.study_id AND 
-          ss2.site_num in ('216') )
-      """
+    val facilityQuery =  s"(SELECT ss1.facility_cd, ss1.site_num FROM  s_site.study_site ss1 , s_site.study_site ss2 WHERE ss1.study_id in (3835) AND  ss1.facility_cd = ss2.facility_cd AND ss1.study_id = ss2.study_id AND ss2.site_num in ('1002'))"
 
     var facMap = scala.collection.immutable.Map.empty[String, String]
     sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).show/*.rdd.
