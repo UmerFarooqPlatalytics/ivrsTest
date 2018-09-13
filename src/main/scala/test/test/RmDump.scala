@@ -198,7 +198,7 @@ object RmDump {
   }
 
   def getConnectionString(userName: String, password: String, host: String, port: String, dbName: String): String = {
-    s"jdbc:oracle:thin:@//${host}:${port}/${dbName}"
+    s"jdbc:oracle:thin:${userName}/${password}@${host}:${port}/${dbName}"
     //s"jdbc:oracle:thin:${userName}/${password}@${host}:${port}/${dbName}"
   }
 
