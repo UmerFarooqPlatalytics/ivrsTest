@@ -30,7 +30,7 @@ object RmDump {
 
     val facilityQuery = s"""
           SELECT * 
-          FROM  s_site.study_site"""
+          FROM  IVRS_OUTPUT_TABLE"""
 //          WHERE ss1.study_id in ('148') AND 
 //          ss1.facility_cd = ss2.facility_cd AND 
 //          ss1.study_id = ss2.study_id AND 
@@ -47,11 +47,11 @@ object RmDump {
 //      """
 
     var facMap = scala.collection.immutable.Map.empty[String, String]
-    val facilityDf = sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).rdd.
+    val facilityDf = sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).show/*.rdd.
       foreach(record => {
         if (record.getAs[String](1) != null && record.getAs[String](0) != null)
           facMap += (record.getAs[String](1) -> record.getAs[String](0))
-      })
+      })*/
   }
 
   def dumpIntoRm() = {
