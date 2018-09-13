@@ -47,7 +47,7 @@ object RmDump {
 //      """
 
     var facMap = scala.collection.immutable.Map.empty[String, String]
-    val facilityDf = sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).show/*.rdd.
+    sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).show/*.rdd.
       foreach(record => {
         if (record.getAs[String](1) != null && record.getAs[String](0) != null)
           facMap += (record.getAs[String](1) -> record.getAs[String](0))
