@@ -115,6 +115,8 @@ object RmDump {
 
       partition.foreach(record => {
 
+        println(record.toSeq)
+        
         val query = s"""
         
         SET @IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}',
