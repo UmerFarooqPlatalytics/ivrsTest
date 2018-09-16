@@ -115,9 +115,6 @@ object RmDump {
 
       partition.foreach(record => {
 
-        println(record.toSeq)
-        println(record.schema.fields.foreach(f => println(f.name)))
-
         val query = s"""
         
       INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
@@ -159,7 +156,7 @@ object RmDump {
             ACURIAN_CONSENTED_DT = VALUES(ACURIAN_CONSENTED_DT),
             ACURIAN_RANDOMIZED_DT = VALUES(ACURIAN_RANDOMIZED_DT),
             ACURIAN_ENROLLED_DT = VALUES(ACURIAN_ENROLLED_DT),
-            ACURIAN_RESOLVED_DT = VALUES(ACURIAN_RESOLVED_DT);
+            ACURIAN_RESOLVED_DT = VALUES(ACURIAN_RESOLVED_DT)
         """
 
         val st: PreparedStatement = dbc.prepareStatement(query)
