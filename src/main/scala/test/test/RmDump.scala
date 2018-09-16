@@ -23,28 +23,7 @@ object RmDump {
     .master("local[*]").appName("test").getOrCreate
 
   def main(args: Array[String]) {
-    //    dumpIntoRm
-
-    var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
-
-//    val facilityQuery = s"""
-//          SELECT * 
-//          FROM  s_site.facility"""
-////          WHERE ss1.study_id in ('148') AND 
-////          ss1.facility_cd = ss2.facility_cd AND 
-////          ss1.study_id = ss2.study_id AND 
-////          ss2.site_num in ('216')"""
-    
-    
-    val facilityQuery =  s"(SELECT ss1.facility_cd, ss1.site_num FROM  s_site.study_site ss1 , s_site.study_site ss2 WHERE ss1.study_id in (3835) AND  ss1.facility_cd = ss2.facility_cd AND ss1.study_id = ss2.study_id AND ss2.site_num in ('1002'))"
-
-    var facMap = scala.collection.immutable.Map.empty[String, String]
-    sparkSession.sqlContext.read.jdbc(url, facilityQuery, prop).show/*.rdd.
-      foreach(record => {
-        if (record.getAs[String](1) != null && record.getAs[String](0) != null)
-          facMap += (record.getAs[String](1) -> record.getAs[String](0))
-      })*/
+    dumpIntoRm
   }
 
   def dumpIntoRm() = {
@@ -129,43 +108,130 @@ object RmDump {
 
     dataToWrite.createOrReplaceTempView("table")
     var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+    val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "dev-db-scan.acurian.com", "1521", "acuqa_users.acurian.com")
 
-    val dbc: Connection = DriverManager.getConnection(url)
-    val st: PreparedStatement = dbc.prepareStatement("YOUR PREPARED STATEMENT")
-    st.execute
+    dataToWrite.foreachPartition(partition => {
 
-    prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
-    prop.setProperty("user", "S_NUMTRA")
-    prop.setProperty("password", "numtradatasci#2018")
-    prop.setProperty("allowExisting", "false")
-    val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
-    outputTable.createOrReplaceTempView("outputTable")
-    //outputTable.schema.fields.foreach(println)
-    val rawData = sparkSession.sqlContext.sql("""
-      select * from table where IVRS_PATIENT_ID IS NOT NULL
-      """)
+      val dbc: Connection = DriverManager.getConnection(url)
 
-    //    rawData.show
+      partition.foreach(record => {
 
-    rawData.createOrReplaceTempView("newTable")
-    val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
-      from outputTable join newTable 
-      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
-      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
-      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
+        val query = s"""
+        
+        SET @IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}',
+            @IVRS_PROTOCOL_NUMBER = '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}',
+            @IVRS_PATIENT_ID = '${record.getAs[String]("IVRS_PATIENT_ID")}',
+            @IVRS_GENDER = '${record.getAs[String]("IVRS_GENDER")}',
+            @IVRS_COUNTRY = '${record.getAs[String]("IVRS_COUNTRY")}',
+            @IVRS_PATIENT_F_INITIAL = '${record.getAs[String]("IVRS_PATIENT_F_INITIAL")}',
+            @IVRS_PATIENT_M_INITIAL = '${record.getAs[String]("IVRS_PATIENT_M_INITIAL")}',
+            @IVRS_PATIENT_L_INITIAL = '${record.getAs[String]("IVRS_PATIENT_L_INITIAL")}',
+            @IVRS_REGION = '${record.getAs[String]("IVRS_REGION")}',
+            @IVRS_DOB_DAY = '${record.getAs[String]("IVRS_DOB_DAY")}',
+            @IVRS_DOB_MONTH = '${record.getAs[String]("IVRS_DOB_MONTH")}',
+            @IVRS_DOB_YEAR = '${record.getAs[String]("IVRS_DOB_YEAR")}',
+            @IVRS_SITE_ID = '${record.getAs[String]("IVRS_SITE_ID")}',
+            @IVRS_INVESTIGATOR_F_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_F_INITIAL")}',
+            @IVRS_INVESTIGATOR_M_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_M_INITIAL")}',
+            @IVRS_INVESTIGATOR_L_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL")}',
+            @IVRS_DATE_SCREEN_FAILED = '${record.getAs[Timestamp]("IVRS_DATE_SCREEN_FAILED")}',
+            @IVRS_DATE_PRE_SCREEN_FAILED = '${record.getAs[Timestamp]("IVRS_DATE_PRE_SCREEN_FAILED")}',
+            @IVRS_DATE_DROPOUT = '${record.getAs[Timestamp]("IVRS_DATE_DROPOUT")}',
+            @IVRS_DATE_PRE_SCREENED = '${record.getAs[Timestamp]("IVRS_DATE_PRE_SCREENED")}',
+            @IVRS_DATE_RANDOMIZATION_FAILED = '${record.getAs[Timestamp]("IVRS_DATE_RANDOMIZATION_FAILED")}',
+            @IVRS_DATE_COMPLETED = '${record.getAs[Timestamp]("IVRS_DATE_COMPLETED")}',
+            @IVRS_DATE_RE_SCREENED = '${record.getAs[Timestamp]("IVRS_DATE_RE_SCREENED")}',
+            @IVRS_DATE_ENROLLMENT = '${record.getAs[Timestamp]("IVRS_DATE_ENROLLMENT")}',
+            @IVRS_DATE_RANDOMIZED = '${record.getAs[Timestamp]("IVRS_DATE_RANDOMIZED")}',
+            @IVRS_DATE_SCREENED = '${record.getAs[Timestamp]("IVRS_DATE_SCREENED")}',
+            @ACURIAN_PROJECT_ID = '${record.getAs[String]("ACURIAN_PROJECT_ID")}',
+            @ACURIAN_SSID = '${record.getAs[String]("ACURIAN_SSID")}',
+            @ACURIAN_PATIENT_ID = '${record.getAs[java.math.BigDecimal]("ACURIAN_PATIENT_ID")}',
+            @ACURIAN_PROTOCOL_NUM = '${record.getAs[String]("ACURIAN_PROTOCOL_NUM")}',
+            @ACURIAN_SITE_ID = '${record.getAs[String]("ACURIAN_SITE_ID")}',
+            @ACURIAN_CONSENTED_DT = '${record.getAs[Timestamp]("ACURIAN_CONSENTED_DT")}',
+            @ACURIAN_RANDOMIZED_DT = '${record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT")}',
+            @ACURIAN_ENROLLED_DT = '${record.getAs[Timestamp]("ACURIAN_ENROLLED_DT")}',
+            @ACURIAN_RESOLVED_DT = '${record.getAs[Timestamp]("ACURIAN_RESOLVED_DT")}';
+      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
+            (IVRS_PROJECT_ID,IVRS_PROTOCOL_NUMBER,IVRS_PATIENT_ID,IVRS_GENDER,IVRS_COUNTRY,IVRS_PATIENT_F_INITIAL,IVRS_PATIENT_M_INITIAL,IVRS_PATIENT_L_INITIAL,IVRS_REGION,IVRS_DOB_DAY,IVRS_DOB_MONTH,IVRS_DOB_YEAR,IVRS_SITE_ID,IVRS_INVESTIGATOR_F_INITIAL,IVRS_INVESTIGATOR_M_INITIAL,IVRS_INVESTIGATOR_L_INITIAL,IVRS_DATE_SCREEN_FAILED,IVRS_DATE_PRE_SCREEN_FAILED,IVRS_DATE_DROPOUT,IVRS_DATE_PRE_SCREENED,IVRS_DATE_RANDOMIZATION_FAILED,IVRS_DATE_COMPLETED,IVRS_DATE_RE_SCREENED,IVRS_DATE_ENROLLMENT,IVRS_DATE_RANDOMIZED,IVRS_DATE_SCREENED,ACURIAN_PROJECT_ID,ACURIAN_SSID,ACURIAN_PATIENT_ID,ACURIAN_PROTOCOL_NUM,ACURIAN_SITE_ID,ACURIAN_CONSENTED_DT,ACURIAN_RANDOMIZED_DT,ACURIAN_ENROLLED_DT,ACURIAN_RESOLVED_DT)
+      VALUES
+            (@IVRS_PROJECT_ID, @IVRS_PROTOCOL_NUMBER, @IVRS_PATIENT_ID, @IVRS_GENDER, @IVRS_COUNTRY, @IVRS_PATIENT_F_INITIAL, @IVRS_PATIENT_M_INITIAL, @IVRS_PATIENT_L_INITIAL, @IVRS_REGION, @IVRS_DOB_DAY, @IVRS_DOB_MONTH, @IVRS_DOB_YEAR, @IVRS_SITE_ID, @IVRS_INVESTIGATOR_F_INITIAL, @IVRS_INVESTIGATOR_M_INITIAL, @IVRS_INVESTIGATOR_L_INITIAL, @IVRS_DATE_SCREEN_FAILED, @IVRS_DATE_PRE_SCREEN_FAILED, @IVRS_DATE_DROPOUT, @IVRS_DATE_PRE_SCREENED, @IVRS_DATE_RANDOMIZATION_FAILED, @IVRS_DATE_COMPLETED, @IVRS_DATE_RE_SCREENED, @IVRS_DATE_ENROLLMENT, @IVRS_DATE_RANDOMIZED, @IVRS_DATE_SCREENED, @ACURIAN_PROJECT_ID, @ACURIAN_SSID, @ACURIAN_PATIENT_ID, @ACURIAN_PROTOCOL_NUM, @ACURIAN_SITE_ID, @ACURIAN_CONSENTED_DT, @ACURIAN_RANDOMIZED_DT, @ACURIAN_ENROLLED_DT, @ACURIAN_RESOLVED_DT)
+      ON DUPLICATE KEY UPDATE
+            IVRS_PROJECT_ID = @IVRS_PROJECT_ID,
+            IVRS_PROTOCOL_NUMBER = @IVRS_PROTOCOL_NUMBER,
+            IVRS_PATIENT_ID = @IVRS_PATIENT_ID,
+            IVRS_GENDER = @IVRS_GENDER,
+            IVRS_COUNTRY = @IVRS_COUNTRY,
+            IVRS_PATIENT_F_INITIAL = @IVRS_PATIENT_F_INITIAL,
+            IVRS_PATIENT_M_INITIAL = @IVRS_PATIENT_M_INITIAL,
+            IVRS_PATIENT_L_INITIAL = @IVRS_PATIENT_L_INITIAL,
+            IVRS_REGION = @IVRS_REGION,
+            IVRS_DOB_DAY = @IVRS_DOB_DAY,
+            IVRS_DOB_MONTH = @IVRS_DOB_MONTH,
+            IVRS_DOB_YEAR = @IVRS_DOB_YEAR,
+            IVRS_SITE_ID = @IVRS_SITE_ID,
+            IVRS_INVESTIGATOR_F_INITIAL = @IVRS_INVESTIGATOR_F_INITIAL,
+            IVRS_INVESTIGATOR_M_INITIAL = @IVRS_INVESTIGATOR_M_INITIAL,
+            IVRS_INVESTIGATOR_L_INITIAL = @IVRS_INVESTIGATOR_L_INITIAL,
+            IVRS_DATE_SCREEN_FAILED = @IVRS_DATE_SCREEN_FAILED,
+            IVRS_DATE_PRE_SCREEN_FAILED = @IVRS_DATE_PRE_SCREEN_FAILED,
+            IVRS_DATE_DROPOUT = @IVRS_DATE_DROPOUT,
+            IVRS_DATE_PRE_SCREENED = @IVRS_DATE_PRE_SCREENED,
+            IVRS_DATE_RANDOMIZATION_FAILED = @IVRS_DATE_RANDOMIZATION_FAILED,
+            IVRS_DATE_COMPLETED = @IVRS_DATE_COMPLETED,
+            IVRS_DATE_RE_SCREENED = @IVRS_DATE_RE_SCREENED,
+            IVRS_DATE_ENROLLMENT = @IVRS_DATE_ENROLLMENT,
+            IVRS_DATE_RANDOMIZED = @IVRS_DATE_RANDOMIZED,
+            IVRS_DATE_SCREENED = @IVRS_DATE_SCREENED,
+            ACURIAN_PROJECT_ID = @ACURIAN_PROJECT_ID,
+            ACURIAN_SSID = @ACURIAN_SSID,
+            ACURIAN_PATIENT_ID = @ACURIAN_PATIENT_ID,
+            ACURIAN_PROTOCOL_NUM = @ACURIAN_PROTOCOL_NUM,
+            ACURIAN_SITE_ID = @ACURIAN_SITE_ID,
+            ACURIAN_CONSENTED_DT = @ACURIAN_CONSENTED_DT,
+            ACURIAN_RANDOMIZED_DT = @ACURIAN_RANDOMIZED_DT,
+            ACURIAN_ENROLLED_DT = @ACURIAN_ENROLLED_DT,
+            ACURIAN_RESOLVED_DT = @ACURIAN_RESOLVED_DT;
+        """
 
-    //updateDF.show
+        val st: PreparedStatement = dbc.prepareStatement(query)
+        st.execute
+      })
+      dbc.close
+    })
 
-    outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
-    val part1 = sparkSession.sqlContext.sql("""
-      SELECT *
-      FROM t1
-      """)
-    val part2 = sparkSession.sqlContext.sql("""
-      SELECT *
-      FROM newTable
-      """)
+    //    prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
+    //    prop.setProperty("user", "S_NUMTRA")
+    //    prop.setProperty("password", "numtradatasci#2018")
+    //    prop.setProperty("allowExisting", "false")
+    //    val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
+    //    outputTable.createOrReplaceTempView("outputTable")
+    //    //outputTable.schema.fields.foreach(println)
+    //    val rawData = sparkSession.sqlContext.sql("""
+    //      select * from table where IVRS_PATIENT_ID IS NOT NULL
+    //      """)
+    //
+    //    //    rawData.show
+    //
+    //    rawData.createOrReplaceTempView("newTable")
+    //    val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
+    //      from outputTable join newTable 
+    //      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
+    //      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
+    //      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
+    //
+    //    //updateDF.show
+    //
+    //    outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
+    //    val part1 = sparkSession.sqlContext.sql("""
+    //      SELECT *
+    //      FROM t1
+    //      """)
+    //    val part2 = sparkSession.sqlContext.sql("""
+    //      SELECT *
+    //      FROM newTable
+    //      """)
 
     //    part1.show
     //    part2.show
@@ -180,21 +246,21 @@ object RmDump {
     //
     //   result.show
 
-    part1.write.mode(SaveMode.Overwrite)
-      .format("jdbc")
-      .option("url", url)
-      .option("user", "S_NUMTRA")
-      .option("password", "numtradatasci#2018")
-      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-      .save()
-
-    part2.write.mode(SaveMode.Append)
-      .format("jdbc")
-      .option("url", url)
-      .option("user", "S_NUMTRA")
-      .option("password", "numtradatasci#2018")
-      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-      .save()
+    //    part1.write.mode(SaveMode.Overwrite)
+    //      .format("jdbc")
+    //      .option("url", url)
+    //      .option("user", "S_NUMTRA")
+    //      .option("password", "numtradatasci#2018")
+    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+    //      .save()
+    //
+    //    part2.write.mode(SaveMode.Append)
+    //      .format("jdbc")
+    //      .option("url", url)
+    //      .option("user", "S_NUMTRA")
+    //      .option("password", "numtradatasci#2018")
+    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
+    //      .save()
 
     //dataToWrite
   }
