@@ -112,6 +112,7 @@ object RmDump {
     dataToWrite.foreachPartition(partition => {
 
       val dbc: Connection = DriverManager.getConnection(url)
+      dbc.setAutoCommit(false)
 
       partition.foreach(record => {
 
