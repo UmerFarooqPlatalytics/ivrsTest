@@ -67,7 +67,7 @@ object RmDump {
 
       Row.fromSeq(Seq(noneCheck((jsonValue \ "IVRS_PROJECT_ID").asOpt[String]),
         noneCheck((jsonValue \ "IVRS_PROTOCOL_NUMBER").asOpt[String]),
-        toDouble(noneCheck((jsonValue \ "IVRS_PATIENT_ID").asOpt[String])),
+        noneCheck((jsonValue \ "IVRS_PATIENT_ID").asOpt[String]),
         noneCheck((jsonValue \ "IVRS_GENDER").asOpt[String]),
         noneCheck((jsonValue \ "IVRS_COUNTRY").asOpt[String]),
         noneCheck((jsonValue \ "IVRS_PATIENT_F_INITIAL").asOpt[String]),
@@ -92,7 +92,7 @@ object RmDump {
         convertToFormat(noneCheck((jsonValue \ "IVRS_DATE_RANDOMIZED").asOpt[String]), dateFormat),
         convertToFormat(noneCheck((jsonValue \ "IVRS_DATE_SCREENED").asOpt[String]), dateFormat),
         noneCheck((jsonValue \ "ACURIAN_PROJECT_ID").asOpt[String]),
-        toDouble(noneCheck((jsonValue \ "ACURIAN_SSID").asOpt[String])),
+        noneCheck((jsonValue \ "ACURIAN_SSID").asOpt[String]),
         toDouble(noneCheck((jsonValue \ "ACURIAN_PATIENT_ID").asOpt[String])),
         noneCheck((jsonValue \ "ACURIAN_PROTOCOL_NUM").asOpt[String]),
         noneCheck((jsonValue \ "ACURIAN_SITE_ID").asOpt[String]),
