@@ -117,46 +117,53 @@ object RmDump {
 
         val query = s"""
         
-      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
-            (IVRS_PROJECT_ID,IVRS_PROTOCOL_NUMBER,IVRS_PATIENT_ID,IVRS_GENDER,IVRS_COUNTRY,IVRS_PATIENT_F_INITIAL,IVRS_PATIENT_M_INITIAL,IVRS_PATIENT_L_INITIAL,IVRS_REGION,IVRS_DOB_DAY,IVRS_DOB_MONTH,IVRS_DOB_YEAR,IVRS_SITE_ID,IVRS_INVESTIGATOR_F_INITIAL,IVRS_INVESTIGATOR_M_INITIAL,IVRS_INVESTIGATOR_L_INITIAL,IVRS_DATE_SCREEN_FAILED,IVRS_DATE_PRE_SCREEN_FAILED,IVRS_DATE_DROPOUT,IVRS_DATE_PRE_SCREENED,IVRS_DATE_RANDOMIZATION_FAILED,IVRS_DATE_COMPLETED,IVRS_DATE_RE_SCREENED,IVRS_DATE_ENROLLMENT,IVRS_DATE_RANDOMIZED,IVRS_DATE_SCREENED,ACURIAN_PROJECT_ID,ACURIAN_SSID,ACURIAN_PATIENT_ID,ACURIAN_PROTOCOL_NUM,ACURIAN_SITE_ID,ACURIAN_CONSENTED_DT,ACURIAN_RANDOMIZED_DT,ACURIAN_ENROLLED_DT,ACURIAN_RESOLVED_DT)
-      VALUES
-            (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-      ON DUPLICATE KEY UPDATE
-            IVRS_PROJECT_ID = VALUES(IVRS_PROJECT_ID),
-            IVRS_PROTOCOL_NUMBER = VALUES(IVRS_PROTOCOL_NUMBER),
-            IVRS_PATIENT_ID = VALUES(IVRS_PATIENT_ID),
-            IVRS_GENDER = VALUES(IVRS_GENDER),
-            IVRS_COUNTRY = VALUES(IVRS_COUNTRY),
-            IVRS_PATIENT_F_INITIAL = VALUES(IVRS_PATIENT_F_INITIAL),
-            IVRS_PATIENT_M_INITIAL = VALUES(IVRS_PATIENT_M_INITIAL),
-            IVRS_PATIENT_L_INITIAL = VALUES(IVRS_PATIENT_L_INITIAL),
-            IVRS_REGION = VALUES(IVRS_REGION),
-            IVRS_DOB_DAY = VALUES(IVRS_DOB_DAY),
-            IVRS_DOB_MONTH = VALUES(IVRS_DOB_MONTH),
-            IVRS_DOB_YEAR = VALUES(IVRS_DOB_YEAR),
-            IVRS_SITE_ID = VALUES(IVRS_SITE_ID),
-            IVRS_INVESTIGATOR_F_INITIAL = VALUES(IVRS_INVESTIGATOR_F_INITIAL),
-            IVRS_INVESTIGATOR_M_INITIAL = VALUES(IVRS_INVESTIGATOR_M_INITIAL),
-            IVRS_INVESTIGATOR_L_INITIAL = VALUES(IVRS_INVESTIGATOR_L_INITIAL),
-            IVRS_DATE_SCREEN_FAILED = VALUES(IVRS_DATE_SCREEN_FAILED),
-            IVRS_DATE_PRE_SCREEN_FAILED = VALUES(IVRS_DATE_PRE_SCREEN_FAILED),
-            IVRS_DATE_DROPOUT = VALUES(IVRS_DATE_DROPOUT),
-            IVRS_DATE_PRE_SCREENED = VALUES(IVRS_DATE_PRE_SCREENED),
-            IVRS_DATE_RANDOMIZATION_FAILED = VALUES(IVRS_DATE_RANDOMIZATION_FAILED),
-            IVRS_DATE_COMPLETED = VALUES(IVRS_DATE_COMPLETED),
-            IVRS_DATE_RE_SCREENED = VALUES(IVRS_DATE_RE_SCREENED),
-            IVRS_DATE_ENROLLMENT = VALUES(IVRS_DATE_ENROLLMENT),
-            IVRS_DATE_RANDOMIZED = VALUES(IVRS_DATE_RANDOMIZED),
-            IVRS_DATE_SCREENED = VALUES(IVRS_DATE_SCREENED),
-            ACURIAN_PROJECT_ID = VALUES(ACURIAN_PROJECT_ID),
-            ACURIAN_SSID = VALUES(ACURIAN_SSID),
-            ACURIAN_PATIENT_ID = VALUES(ACURIAN_PATIENT_ID),
-            ACURIAN_PROTOCOL_NUM = VALUES(ACURIAN_PROTOCOL_NUM),
-            ACURIAN_SITE_ID = VALUES(ACURIAN_SITE_ID),
-            ACURIAN_CONSENTED_DT = VALUES(ACURIAN_CONSENTED_DT),
-            ACURIAN_RANDOMIZED_DT = VALUES(ACURIAN_RANDOMIZED_DT),
-            ACURIAN_ENROLLED_DT = VALUES(ACURIAN_ENROLLED_DT),
-            ACURIAN_RESOLVED_DT = VALUES(ACURIAN_RESOLVED_DT)
+      MERGE INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
+      USING dual
+      ON (IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}' 
+          AND IVRS_PROTOCOL_NUMBER = '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' 
+          AND IVRS_PATIENT_ID = '${record.getAs[String]("IVRS_PATIENT_ID")}' 
+          AND IVRS_COUNTRY = '${record.getAs[String]("IVRS_COUNTRY")}')
+          
+      WHEN MATCHED THEN
+      UPDATE SET  IVRS_PROJECT_ID = ?
+                  IVRS_PROTOCOL_NUMBER = ?
+                  IVRS_PATIENT_ID = ?
+                  IVRS_GENDER = ?
+                  IVRS_COUNTRY = ?
+                  IVRS_PATIENT_F_INITIAL = ?
+                  IVRS_PATIENT_M_INITIAL = ?
+                  IVRS_PATIENT_L_INITIAL = ?
+                  IVRS_REGION = ?
+                  IVRS_DOB_DAY = ?
+                  IVRS_DOB_MONTH = ?
+                  IVRS_DOB_YEAR = ?
+                  IVRS_SITE_ID = ?
+                  IVRS_INVESTIGATOR_F_INITIAL = ?
+                  IVRS_INVESTIGATOR_M_INITIAL = ?
+                  IVRS_INVESTIGATOR_L_INITIAL = ?
+                  IVRS_DATE_SCREEN_FAILED = ?
+                  IVRS_DATE_PRE_SCREEN_FAILED = ?
+                  IVRS_DATE_DROPOUT = ?
+                  IVRS_DATE_PRE_SCREENED = ?
+                  IVRS_DATE_RANDOMIZATION_FAILED = ?
+                  IVRS_DATE_COMPLETED = ?
+                  IVRS_DATE_RE_SCREENED = ?
+                  IVRS_DATE_ENROLLMENT = ?
+                  IVRS_DATE_RANDOMIZED = ?
+                  IVRS_DATE_SCREENED = ?
+                  ACURIAN_PROJECT_ID = ?
+                  ACURIAN_SSID = ?
+                  ACURIAN_PATIENT_ID = ?
+                  ACURIAN_PROTOCOL_NUM = ?
+                  ACURIAN_SITE_ID = ?
+                  ACURIAN_CONSENTED_DT = ?
+                  ACURIAN_RANDOMIZED_DT = ?
+                  ACURIAN_ENROLLED_DT = ?
+                  ACURIAN_RESOLVED_DT = ?
+       
+      WHEN NOT MATCHED THEN   
+      INSERT (IVRS_PROJECT_ID,IVRS_PROTOCOL_NUMBER,IVRS_PATIENT_ID,IVRS_GENDER,IVRS_COUNTRY,IVRS_PATIENT_F_INITIAL,IVRS_PATIENT_M_INITIAL,IVRS_PATIENT_L_INITIAL,IVRS_REGION,IVRS_DOB_DAY,IVRS_DOB_MONTH,IVRS_DOB_YEAR,IVRS_SITE_ID,IVRS_INVESTIGATOR_F_INITIAL,IVRS_INVESTIGATOR_M_INITIAL,IVRS_INVESTIGATOR_L_INITIAL,IVRS_DATE_SCREEN_FAILED,IVRS_DATE_PRE_SCREEN_FAILED,IVRS_DATE_DROPOUT,IVRS_DATE_PRE_SCREENED,IVRS_DATE_RANDOMIZATION_FAILED,IVRS_DATE_COMPLETED,IVRS_DATE_RE_SCREENED,IVRS_DATE_ENROLLMENT,IVRS_DATE_RANDOMIZED,IVRS_DATE_SCREENED,ACURIAN_PROJECT_ID,ACURIAN_SSID,ACURIAN_PATIENT_ID,ACURIAN_PROTOCOL_NUM,ACURIAN_SITE_ID,ACURIAN_CONSENTED_DT,ACURIAN_RANDOMIZED_DT,ACURIAN_ENROLLED_DT,ACURIAN_RESOLVED_DT)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
 
         val st: PreparedStatement = dbc.prepareStatement(query)
@@ -196,6 +203,41 @@ object RmDump {
         st.setTimestamp(33, record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT"))
         st.setTimestamp(34, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
         st.setTimestamp(35, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
+        st.setString(36, record.getAs[String]("IVRS_PROJECT_ID"))
+        st.setString(37, record.getAs[String]("IVRS_PROTOCOL_NUMBER"))
+        st.setString(38, record.getAs[String]("IVRS_PATIENT_ID"))
+        st.setString(39, record.getAs[String]("IVRS_GENDER"))
+        st.setString(40, record.getAs[String]("IVRS_COUNTRY"))
+        st.setString(41, record.getAs[String]("IVRS_PATIENT_F_INITIAL"))
+        st.setString(42, record.getAs[String]("IVRS_PATIENT_M_INITIAL"))
+        st.setString(43, record.getAs[String]("IVRS_PATIENT_L_INITIAL"))
+        st.setString(44, record.getAs[String]("IVRS_REGION"))
+        st.setString(45, record.getAs[String]("IVRS_DOB_DAY"))
+        st.setString(46, record.getAs[String]("IVRS_DOB_MONTH"))
+        st.setString(47, record.getAs[String]("IVRS_DOB_YEAR"))
+        st.setString(48, record.getAs[String]("IVRS_SITE_ID"))
+        st.setString(49, record.getAs[String]("IVRS_INVESTIGATOR_F_INITIAL"))
+        st.setString(50, record.getAs[String]("IVRS_INVESTIGATOR_M_INITIAL"))
+        st.setString(51, record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL"))
+        st.setTimestamp(52, record.getAs[Timestamp]("IVRS_DATE_SCREEN_FAILED"))
+        st.setTimestamp(53, record.getAs[Timestamp]("IVRS_DATE_PRE_SCREEN_FAILED"))
+        st.setTimestamp(54, record.getAs[Timestamp]("IVRS_DATE_DROPOUT"))
+        st.setTimestamp(55, record.getAs[Timestamp]("IVRS_DATE_PRE_SCREENED"))
+        st.setTimestamp(56, record.getAs[Timestamp]("IVRS_DATE_RANDOMIZATION_FAILED"))
+        st.setTimestamp(57, record.getAs[Timestamp]("IVRS_DATE_COMPLETED"))
+        st.setTimestamp(58, record.getAs[Timestamp]("IVRS_DATE_RE_SCREENED"))
+        st.setTimestamp(59, record.getAs[Timestamp]("IVRS_DATE_ENROLLMENT"))
+        st.setTimestamp(60, record.getAs[Timestamp]("IVRS_DATE_RANDOMIZED"))
+        st.setTimestamp(61, record.getAs[Timestamp]("IVRS_DATE_SCREENED"))
+        st.setString(62, record.getAs[String]("ACURIAN_PROJECT_ID"))
+        st.setString(63, record.getAs[String]("ACURIAN_SSID"))
+        st.setBigDecimal(64, record.getAs[java.math.BigDecimal]("ACURIAN_PATIENT_ID"))
+        st.setString(65, record.getAs[String]("ACURIAN_PROTOCOL_NUM"))
+        st.setString(66, record.getAs[String]("ACURIAN_SITE_ID"))
+        st.setTimestamp(67, record.getAs[Timestamp]("ACURIAN_CONSENTED_DT"))
+        st.setTimestamp(68, record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT"))
+        st.setTimestamp(69, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
+        st.setTimestamp(70, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
 
         st.execute
       })
