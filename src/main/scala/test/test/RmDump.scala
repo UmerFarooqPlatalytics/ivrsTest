@@ -176,7 +176,7 @@ object RmDump {
         st.setString(9, record.getAs[String]("IVRS_SITE_ID"))
         st.setString(10, record.getAs[String]("IVRS_INVESTIGATOR_F_INITIAL"))
         st.setString(11, record.getAs[String]("IVRS_INVESTIGATOR_M_INITIAL"))
-        st.setString(13, record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL"))
+        st.setString(12, record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL"))
         st.setTimestamp(13, record.getAs[Timestamp]("IVRS_DATE_SCREEN_FAILED"))
         st.setTimestamp(14, record.getAs[Timestamp]("IVRS_DATE_PRE_SCREEN_FAILED"))
         st.setTimestamp(15, record.getAs[Timestamp]("IVRS_DATE_DROPOUT"))
