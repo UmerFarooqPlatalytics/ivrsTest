@@ -121,8 +121,7 @@ object RmDump {
         
       INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
             (IVRS_PROJECT_ID)
-      VALUES
-            (?);
+      VALUES (?)
      """/* ON DUPLICATE KEY UPDATE
             IVRS_PROJECT_ID = @IVRS_PROJECT_ID,
             IVRS_PROTOCOL_NUMBER = @IVRS_PROTOCOL_NUMBER,
