@@ -58,7 +58,6 @@ object RmDump {
 
       val toDouble = (value: String) => {
         if (value != null) {
-          println(value)
           new java.math.BigDecimal(value.replace("-", ""), MathContext.DECIMAL64)
         } else
           null
@@ -108,7 +107,7 @@ object RmDump {
 
     dataToWrite.createOrReplaceTempView("table")
     var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "numtradatasci#2018", "dev-db-scan.acurian.com", "1521", "acuqa_users.acurian.com")
+    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "dev-db-scan.acurian.com", "1521", "acuqa_users.acurian.com")
 
     dataToWrite.foreachPartition(partition => {
 
