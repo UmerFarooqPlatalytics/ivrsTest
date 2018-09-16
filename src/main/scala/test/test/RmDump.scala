@@ -119,29 +119,10 @@ object RmDump {
         
         val query = s"""
         
-        SET @IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}',
-            @IVRS_PROTOCOL_NUMBER = '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}',
-            @IVRS_PATIENT_ID = '${record.getAs[String]("IVRS_PATIENT_ID")}',
-            @IVRS_GENDER = '${record.getAs[String]("IVRS_GENDER")}',
-            @IVRS_COUNTRY = '${record.getAs[String]("IVRS_COUNTRY")}',
-            @IVRS_PATIENT_F_INITIAL = '${record.getAs[String]("IVRS_PATIENT_F_INITIAL")}',
-            @IVRS_PATIENT_M_INITIAL = '${record.getAs[String]("IVRS_PATIENT_M_INITIAL")}',
-            @IVRS_PATIENT_L_INITIAL = '${record.getAs[String]("IVRS_PATIENT_L_INITIAL")}',
-            @IVRS_REGION = '${record.getAs[String]("IVRS_REGION")}',
-            @IVRS_DOB_DAY = '${record.getAs[String]("IVRS_DOB_DAY")}',
-            @IVRS_DOB_MONTH = '${record.getAs[String]("IVRS_DOB_MONTH")}',
-            @IVRS_DOB_YEAR = '${record.getAs[String]("IVRS_DOB_YEAR")}',
-            @IVRS_SITE_ID = '${record.getAs[String]("IVRS_SITE_ID")}',
-            @IVRS_INVESTIGATOR_F_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_F_INITIAL")}',
-            @IVRS_INVESTIGATOR_M_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_M_INITIAL")}',
-            @IVRS_INVESTIGATOR_L_INITIAL = '${record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL")}',
-            @ACURIAN_PROJECT_ID = '${record.getAs[String]("ACURIAN_PROJECT_ID")}',
-            @ACURIAN_SSID = '${record.getAs[String]("ACURIAN_SSID")}',
-            @ACURIAN_PROTOCOL_NUM = '${record.getAs[String]("ACURIAN_PROTOCOL_NUM")}'
       INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
-            (IVRS_PROJECT_ID,IVRS_PROTOCOL_NUMBER,IVRS_PATIENT_ID,IVRS_GENDER,IVRS_COUNTRY,IVRS_PATIENT_F_INITIAL,IVRS_PATIENT_M_INITIAL,IVRS_PATIENT_L_INITIAL,IVRS_REGION,IVRS_DOB_DAY,IVRS_DOB_MONTH,IVRS_DOB_YEAR,IVRS_SITE_ID,IVRS_INVESTIGATOR_F_INITIAL,IVRS_INVESTIGATOR_M_INITIAL,IVRS_INVESTIGATOR_L_INITIAL,ACURIAN_PROJECT_ID,ACURIAN_SSID,ACURIAN_PROTOCOL_NUM,ACURIAN_SITE_ID)
+            (IVRS_PROJECT_ID)
       VALUES
-            (@IVRS_PROJECT_ID, @IVRS_PROTOCOL_NUMBER, @IVRS_PATIENT_ID, @IVRS_GENDER, @IVRS_COUNTRY, @IVRS_PATIENT_F_INITIAL, @IVRS_PATIENT_M_INITIAL, @IVRS_PATIENT_L_INITIAL, @IVRS_REGION, @IVRS_DOB_DAY, @IVRS_DOB_MONTH, @IVRS_DOB_YEAR, @IVRS_SITE_ID, @IVRS_INVESTIGATOR_F_INITIAL, @IVRS_INVESTIGATOR_M_INITIAL, @IVRS_INVESTIGATOR_L_INITIAL, @ACURIAN_PROJECT_ID, @ACURIAN_SSID, @ACURIAN_PROTOCOL_NUM, @ACURIAN_SITE_ID);
+            (?);
      """/* ON DUPLICATE KEY UPDATE
             IVRS_PROJECT_ID = @IVRS_PROJECT_ID,
             IVRS_PROTOCOL_NUMBER = @IVRS_PROTOCOL_NUMBER,
@@ -181,6 +162,28 @@ object RmDump {
         """*/
 
         val st: PreparedStatement = dbc.prepareStatement(query)
+        
+        st.setString(1,record.getAs[String]("IVRS_PROJECT_ID"))
+//        st.setString(2,record.getAs[String]("IVRS_PROJECT_ID"))
+//        st.setString(3,"")
+//        st.setString(4,"")
+//        st.setString(5,"")
+//        st.setString(6,"")
+//        st.setString(7,"")
+//        st.setString(8,"")
+//        st.setString(9,"")
+//        st.setString(10,"")
+//        st.setString(11,"")
+//        st.setString(11,"")
+//        st.setString(12,"")
+//        st.setString(13,"")
+//        st.setString(14,"")
+//        st.setString(15,"")
+//        st.setString(16,"")
+//        st.setString(17,"")
+//        st.setString(18,"")
+//        st.setString(19,"")
+        
         st.execute
       })
       dbc.close
