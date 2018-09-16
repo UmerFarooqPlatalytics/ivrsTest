@@ -116,6 +116,7 @@ object RmDump {
       partition.foreach(record => {
 
         println(record.toSeq)
+        println(record.schema.fields.foreach(f => println(f.name)))
 
         val query = s"""
         
