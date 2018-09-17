@@ -232,6 +232,8 @@ object RmDump {
 
       st.execute
     })
+    
+    dbc.close
 
     //    prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
     //    prop.setProperty("user", "S_NUMTRA")
