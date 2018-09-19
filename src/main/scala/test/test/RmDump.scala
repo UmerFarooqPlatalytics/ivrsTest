@@ -231,7 +231,7 @@ object RmDump {
       st.setTimestamp(66, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
 
       st.execute
-      st.closeOnCompletion
+      st.close
     })
     
     dbc.close
