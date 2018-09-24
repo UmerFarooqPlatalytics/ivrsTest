@@ -107,7 +107,7 @@ object RmDump {
 
     dataToWrite.createOrReplaceTempView("table")
     var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "dev-db-scan.acurian.com", "1521", "acuqa_users.acurian.com")
+    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
 
     val dbc: Connection = DriverManager.getConnection(url)
     dbc.setAutoCommit(false)
@@ -235,74 +235,10 @@ object RmDump {
     })
     
     dbc.close
-
-    //    prop.setProperty("driver", "oracle.jdbc.driver.OracleDriver")
-    //    prop.setProperty("user", "S_NUMTRA")
-    //    prop.setProperty("password", "numtradatasci#2018")
-    //    prop.setProperty("allowExisting", "false")
-    //    val outputTable = sparkSession.sqlContext.read.jdbc(url, "S_NUMTRA.IVRS_ACURIAN_OUTPUT", prop)
-    //    outputTable.createOrReplaceTempView("outputTable")
-    //    //outputTable.schema.fields.foreach(println)
-    //    val rawData = sparkSession.sqlContext.sql("""
-    //      select * from table where IVRS_PATIENT_ID IS NOT NULL
-    //      """)
-    //
-    //    //    rawData.show
-    //
-    //    rawData.createOrReplaceTempView("newTable")
-    //    val updateDF = sparkSession.sqlContext.sql("""select outputTable.* 
-    //      from outputTable join newTable 
-    //      on outputTable.IVRS_PROJECT_ID = newTable.IVRS_PROJECT_ID AND
-    //      outputTable.IVRS_PROTOCOL_NUMBER = newTable.IVRS_PROTOCOL_NUMBER AND
-    //      outputTable.IVRS_PATIENT_ID = newTable.IVRS_PATIENT_ID""")
-    //
-    //    //updateDF.show
-    //
-    //    outputTable.except(updateDF).createOrReplaceTempView("t1") //.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").union(rawData).createOrReplaceTempView("oneMore")//union(rawData).
-    //    val part1 = sparkSession.sqlContext.sql("""
-    //      SELECT *
-    //      FROM t1
-    //      """)
-    //    val part2 = sparkSession.sqlContext.sql("""
-    //      SELECT *
-    //      FROM newTable
-    //      """)
-
-    //    part1.show
-    //    part2.show
-
-    //outputTable.drop("CREATE_DATE").drop("UPDATE_DATE").drop("MATCH_RANK").show//.except(updateDF).show //.union(rawData).createOrReplaceTempView("forResult")
-    //
-    //    val result = sparkSession.sqlContext.sql("""
-    //      SELECT *, NULL as MATCH_RANK
-    //      FROM forResult
-    //      WHERE IVRS_PATIENT_F_INITIAL = 'US'
-    //      """)
-    //
-    //   result.show
-
-    //    part1.write.mode(SaveMode.Overwrite)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
-    //
-    //    part2.write.mode(SaveMode.Append)
-    //      .format("jdbc")
-    //      .option("url", url)
-    //      .option("user", "S_NUMTRA")
-    //      .option("password", "numtradatasci#2018")
-    //      .option("dbtable", "S_NUMTRA.IVRS_ACURIAN_OUTPUT")
-    //      .save()
-
-    //dataToWrite
   }
 
   def getConnectionString(userName: String, password: String, host: String, port: String, dbName: String): String = {
     s"jdbc:oracle:thin:${userName}/${password}@${host}:${port}/${dbName}"
-    //s"jdbc:oracle:thin:${userName}/${password}@${host}:${port}/${dbName}"
   }
 
   def outputSchema(): StructType = {
