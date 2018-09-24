@@ -117,11 +117,12 @@ object RmDump {
       val query = s"""
         
       MERGE INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
-      USING dual
-      ON (IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}' 
-          AND IVRS_PROTOCOL_NUMBER = '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' 
-          AND IVRS_PATIENT_ID = '${record.getAs[String]("IVRS_PATIENT_ID")}' 
-          AND IVRS_COUNTRY = '${record.getAs[String]("IVRS_COUNTRY")}')
+      USING S_ACUTRACK.IVRS_ACURIAN_OUTPUT t
+      
+      ON (
+      ('${record.getAs[String]("IVRS_PROJECT_ID")}', '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}', '${record.getAs[String]("IVRS_PATIENT_ID")}', '${record.getAs[String]("IVRS_COUNTRY")}')
+      IN (SELECT IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_COUNTRY from t)
+      )
           
       WHEN MATCHED THEN
       UPDATE SET  IVRS_GENDER = ?,
