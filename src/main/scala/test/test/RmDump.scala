@@ -121,7 +121,7 @@ object RmDump {
       ON (IVRS_PROJECT_ID = '${record.getAs[String]("IVRS_PROJECT_ID")}' 
           AND IVRS_PROTOCOL_NUMBER = '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' 
           AND IVRS_PATIENT_ID = '${record.getAs[String]("IVRS_PATIENT_ID")}' 
-          AND IVRS_COUNTRY = '${record.getAs[String]("IVRS_COUNTRY")}')
+          
           
       WHEN MATCHED THEN
       UPDATE SET  IVRS_GENDER = ?,
