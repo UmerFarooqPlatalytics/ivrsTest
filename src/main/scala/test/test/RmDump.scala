@@ -240,6 +240,8 @@ object RmDump {
 
       updateStatement.execute
       updateStatement.close
+      
+      println(s"======== KEY COUNT : ${forInsert.count}")
       if (forInsert.count == 0) {
         insertStatement.execute
         insertStatement.close
