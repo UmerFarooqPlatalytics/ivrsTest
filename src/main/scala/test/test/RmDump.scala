@@ -166,8 +166,6 @@ object RmDump {
       AND '${record.getAs[String]("IVRS_PATIENT_ID")}' = IVRS_PATIENT_ID 
       """
 
-      val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
-
       val updateStatement: PreparedStatement = dbc.prepareStatement(updateQuery)
       val insertStatement: PreparedStatement = dbc.prepareStatement(insertQuery)
 
@@ -240,7 +238,7 @@ object RmDump {
 
       updateStatement.execute
       updateStatement.close
-      
+      val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
       println(s"======== KEY COUNT : ${forInsert.count}")
       if (forInsert.count == 0) {
         insertStatement.execute
