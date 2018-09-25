@@ -240,6 +240,7 @@ object RmDump {
       updateStatement.close
       val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
       println(s"======== KEY COUNT : ${forInsert.count}")
+      println(record)
       if (forInsert.count == 0) {
         insertStatement.execute
         insertStatement.close
