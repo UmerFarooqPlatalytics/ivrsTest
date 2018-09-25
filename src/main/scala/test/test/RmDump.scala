@@ -117,11 +117,11 @@ object RmDump {
       val query = s"""
         
       MERGE INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT
-      USING S_ACUTRACK.IVRS_ACURIAN_OUTPUT
+      USING dual
       
       ON (
       ('${record.getAs[String]("IVRS_PROJECT_ID")}', '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}', '${record.getAs[String]("IVRS_PATIENT_ID")}', '${record.getAs[String]("IVRS_COUNTRY")}')
-      IN (SELECT t.IVRS_PROJECT_ID, t.IVRS_PROTOCOL_NUMBER, t.IVRS_PATIENT_ID, t.IVRS_COUNTRY from S_ACUTRACK.IVRS_ACURIAN_OUTPUT t)
+      IN (SELECT IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_COUNTRY FROM dual)
       )
           
       WHEN MATCHED THEN
