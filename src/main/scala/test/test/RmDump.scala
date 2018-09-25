@@ -152,54 +152,57 @@ object RmDump {
       AND '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' = IVRS_PROTOCOL_NUMBER
       AND '${record.getAs[String]("IVRS_PATIENT_ID")}' = IVRS_PATIENT_ID 
       AND '${record.getAs[String]("IVRS_COUNTRY")}' = IVRS_COUNTRY"""
-    
-    val insertQuery = """
-      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT(IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_GENDER, IVRS_COUNTRY, IVRS_PATIENT_F_INITIAL, IVRS_PATIENT_M_INITIAL, IVRS_PATIENT_L_INITIAL, IVRS_REGION, IVRS_DOB_DAY, IVRS_DOB_MONTH, IVRS_DOB_YEAR, IVRS_SITE_ID, IVRS_INVESTIGATOR_F_INITIAL, IVRS_INVESTIGATOR_M_INITIAL, IVRS_INVESTIGATOR_L_INITIAL, IVRS_DATE_SCREEN_FAILED, IVRS_DATE_PRE_SCREEN_FAILED, IVRS_DATE_DROPOUT, IVRS_DATE_PRE_SCREENED, IVRS_DATE_RANDOMIZATION_FAILED, IVRS_DATE_COMPLETED, IVRS_DATE_RE_SCREENED, IVRS_DATE_ENROLLMENT, IVRS_DATE_RANDOMIZED, IVRS_DATE_SCREENED, ACURIAN_PROJECT_ID, ACURIAN_SSID, ACURIAN_PATIENT_ID, ACURIAN_PROTOCOL_NUM, ACURIAN_SITE_ID, ACURIAN_CONSENTED_DT, ACURIAN_RANDOMIZED_DT, ACURIAN_ENROLLED_DT, ACURIAN_RESOLVED_DT)
+
+      val insertQuery = """
+      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT (IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_GENDER, IVRS_COUNTRY, IVRS_PATIENT_F_INITIAL, IVRS_PATIENT_M_INITIAL, IVRS_PATIENT_L_INITIAL, IVRS_REGION, IVRS_DOB_DAY, IVRS_DOB_MONTH, IVRS_DOB_YEAR, IVRS_SITE_ID, IVRS_INVESTIGATOR_F_INITIAL, IVRS_INVESTIGATOR_M_INITIAL, IVRS_INVESTIGATOR_L_INITIAL, IVRS_DATE_SCREEN_FAILED, IVRS_DATE_PRE_SCREEN_FAILED, IVRS_DATE_DROPOUT, IVRS_DATE_PRE_SCREENED, IVRS_DATE_RANDOMIZATION_FAILED, IVRS_DATE_COMPLETED, IVRS_DATE_RE_SCREENED, IVRS_DATE_ENROLLMENT, IVRS_DATE_RANDOMIZED, IVRS_DATE_SCREENED, ACURIAN_PROJECT_ID, ACURIAN_SSID, ACURIAN_PATIENT_ID, ACURIAN_PROTOCOL_NUM, ACURIAN_SITE_ID, ACURIAN_CONSENTED_DT, ACURIAN_RANDOMIZED_DT, ACURIAN_ENROLLED_DT, ACURIAN_RESOLVED_DT)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-      EXCEPTION
-      WHEN DUP_VAL_ON_INDEX THEN
-      UPDATE S_ACUTRACK.IVRS_ACURIAN_OUTPUT SET
-            IVRS_GENDER = VALUES(IVRS_GENDER),
-            IVRS_PATIENT_F_INITIAL = VALUES(IVRS_PATIENT_F_INITIAL),
-            IVRS_PATIENT_M_INITIAL = VALUES(IVRS_PATIENT_M_INITIAL),
-            IVRS_PATIENT_L_INITIAL = VALUES(IVRS_PATIENT_L_INITIAL),
-            IVRS_REGION = VALUES(IVRS_REGION),
-            IVRS_DOB_DAY = VALUES(IVRS_DOB_DAY),
-            IVRS_DOB_MONTH = VALUES(IVRS_DOB_MONTH),
-            IVRS_DOB_YEAR = VALUES(IVRS_DOB_YEAR),
-            IVRS_SITE_ID = VALUES(IVRS_SITE_ID),
-            IVRS_INVESTIGATOR_F_INITIAL = VALUES(IVRS_INVESTIGATOR_F_INITIAL),
-            IVRS_INVESTIGATOR_M_INITIAL = VALUES(IVRS_INVESTIGATOR_M_INITIAL),
-            IVRS_INVESTIGATOR_L_INITIAL = VALUES(IVRS_INVESTIGATOR_L_INITIAL),
-            IVRS_DATE_SCREEN_FAILED = VALUES(IVRS_DATE_SCREEN_FAILED),
-            IVRS_DATE_PRE_SCREEN_FAILED = VALUES(IVRS_DATE_PRE_SCREEN_FAILED),
-            IVRS_DATE_DROPOUT = VALUES(IVRS_DATE_DROPOUT),
-            IVRS_DATE_PRE_SCREENED = VALUES(IVRS_DATE_PRE_SCREENED),
-            IVRS_DATE_RANDOMIZATION_FAILED = VALUES(IVRS_DATE_RANDOMIZATION_FAILED),
-            IVRS_DATE_COMPLETED = VALUES(IVRS_DATE_COMPLETED),
-            IVRS_DATE_RE_SCREENED = VALUES(IVRS_DATE_RE_SCREENED),
-            IVRS_DATE_ENROLLMENT = VALUES(IVRS_DATE_ENROLLMENT),
-            IVRS_DATE_RANDOMIZED = VALUES(IVRS_DATE_RANDOMIZED),
-            IVRS_DATE_SCREENED = VALUES(IVRS_DATE_SCREENED),
-            ACURIAN_PROJECT_ID = VALUES(ACURIAN_PROJECT_ID),
-            ACURIAN_SSID = VALUES(ACURIAN_SSID),
-            ACURIAN_PATIENT_ID = VALUES(ACURIAN_PATIENT_ID),
-            ACURIAN_PROTOCOL_NUM = VALUES(ACURIAN_PROTOCOL_NUM),
-            ACURIAN_SITE_ID = VALUES(ACURIAN_SITE_ID),
-            ACURIAN_CONSENTED_DT = VALUES(ACURIAN_CONSENTED_DT),
-            ACURIAN_RANDOMIZED_DT = VALUES(ACURIAN_RANDOMIZED_DT),
-            ACURIAN_ENROLLED_DT = VALUES(ACURIAN_ENROLLED_DT),
-            ACURIAN_RESOLVED_DT = VALUES(ACURIAN_RESOLVED_DT)
-    WHERE '${record.getAs[String]("IVRS_PROJECT_ID")}' = IVRS_PROJECT_ID 
+    """
+
+      val fetchQuery = """
+      SELECT * 
+      FROM S_ACUTRACK.IVRS_ACURIAN_OUTPUT
+      WHERE '${record.getAs[String]("IVRS_PROJECT_ID")}' = IVRS_PROJECT_ID 
       AND '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' = IVRS_PROTOCOL_NUMBER
       AND '${record.getAs[String]("IVRS_PATIENT_ID")}' = IVRS_PATIENT_ID 
       AND '${record.getAs[String]("IVRS_COUNTRY")}' = IVRS_COUNTRY
-    """
-        
+      """
 
-      //val updateStatement: PreparedStatement = dbc.prepareStatement(updateQuery)
+      val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
+
+      val updateStatement: PreparedStatement = dbc.prepareStatement(updateQuery)
       val insertStatement: PreparedStatement = dbc.prepareStatement(insertQuery)
 
+      updateStatement.setString(1, record.getAs[String]("IVRS_GENDER"))
+      updateStatement.setString(2, record.getAs[String]("IVRS_PATIENT_F_INITIAL"))
+      updateStatement.setString(3, record.getAs[String]("IVRS_PATIENT_M_INITIAL"))
+      updateStatement.setString(4, record.getAs[String]("IVRS_PATIENT_L_INITIAL"))
+      updateStatement.setString(5, record.getAs[String]("IVRS_REGION"))
+      updateStatement.setString(6, record.getAs[String]("IVRS_DOB_DAY"))
+      updateStatement.setString(7, record.getAs[String]("IVRS_DOB_MONTH"))
+      updateStatement.setString(8, record.getAs[String]("IVRS_DOB_YEAR"))
+      updateStatement.setString(9, record.getAs[String]("IVRS_SITE_ID"))
+      updateStatement.setString(10, record.getAs[String]("IVRS_INVESTIGATOR_F_INITIAL"))
+      updateStatement.setString(11, record.getAs[String]("IVRS_INVESTIGATOR_M_INITIAL"))
+      updateStatement.setString(12, record.getAs[String]("IVRS_INVESTIGATOR_L_INITIAL"))
+      updateStatement.setTimestamp(13, record.getAs[Timestamp]("IVRS_DATE_SCREEN_FAILED"))
+      updateStatement.setTimestamp(14, record.getAs[Timestamp]("IVRS_DATE_PRE_SCREEN_FAILED"))
+      updateStatement.setTimestamp(15, record.getAs[Timestamp]("IVRS_DATE_DROPOUT"))
+      updateStatement.setTimestamp(16, record.getAs[Timestamp]("IVRS_DATE_PRE_SCREENED"))
+      updateStatement.setTimestamp(17, record.getAs[Timestamp]("IVRS_DATE_RANDOMIZATION_FAILED"))
+      updateStatement.setTimestamp(18, record.getAs[Timestamp]("IVRS_DATE_COMPLETED"))
+      updateStatement.setTimestamp(19, record.getAs[Timestamp]("IVRS_DATE_RE_SCREENED"))
+      updateStatement.setTimestamp(20, record.getAs[Timestamp]("IVRS_DATE_ENROLLMENT"))
+      updateStatement.setTimestamp(21, record.getAs[Timestamp]("IVRS_DATE_RANDOMIZED"))
+      updateStatement.setTimestamp(22, record.getAs[Timestamp]("IVRS_DATE_SCREENED"))
+      updateStatement.setString(23, record.getAs[String]("ACURIAN_PROJECT_ID"))
+      updateStatement.setString(24, record.getAs[String]("ACURIAN_SSID"))
+      updateStatement.setBigDecimal(25, record.getAs[java.math.BigDecimal]("ACURIAN_PATIENT_ID"))
+      updateStatement.setString(26, record.getAs[String]("ACURIAN_PROTOCOL_NUM"))
+      updateStatement.setString(27, record.getAs[String]("ACURIAN_SITE_ID"))
+      updateStatement.setTimestamp(28, record.getAs[Timestamp]("ACURIAN_CONSENTED_DT"))
+      updateStatement.setTimestamp(29, record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT"))
+      updateStatement.setTimestamp(30, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
+      updateStatement.setTimestamp(31, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
       insertStatement.setString(1, record.getAs[String]("IVRS_PROJECT_ID"))
       insertStatement.setString(2, record.getAs[String]("IVRS_PROTOCOL_NUMBER"))
       insertStatement.setString(3, record.getAs[String]("IVRS_PATIENT_ID"))
@@ -236,12 +239,14 @@ object RmDump {
       insertStatement.setTimestamp(34, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
       insertStatement.setTimestamp(35, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
 
-//      updateStatement.execute
-//      updateStatement.close
-      insertStatement.execute
-      insertStatement.close
+      updateStatement.execute
+      updateStatement.close
+      if (forInsert.count == 0) {
+        insertStatement.execute
+        insertStatement.close
+      }
     })
-    
+
     dbc.close
   }
 
