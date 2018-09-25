@@ -164,7 +164,6 @@ object RmDump {
       WHERE '${record.getAs[String]("IVRS_PROJECT_ID")}' = IVRS_PROJECT_ID 
       AND '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' = IVRS_PROTOCOL_NUMBER
       AND '${record.getAs[String]("IVRS_PATIENT_ID")}' = IVRS_PATIENT_ID 
-      AND '${record.getAs[String]("IVRS_COUNTRY")}' = IVRS_COUNTRY
       """
 
       val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
