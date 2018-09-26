@@ -110,9 +110,9 @@ object RmDump {
     val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
 
     val dbc: Connection = DriverManager.getConnection(url)
-    dbc.setAutoCommit(false)
+    dbc.setAutoCommit(true)
 
-    dataToWrite.rdd.collect.foreach(record => {
+    dataToWrite.rdd.map(record => {
 
       val updateQuery = s"""
       
