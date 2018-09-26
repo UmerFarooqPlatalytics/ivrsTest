@@ -158,7 +158,7 @@ object RmDump {
       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """
 
-      val fetchQuery = """
+      val fetchQuery = s"""
       SELECT * 
       FROM S_ACUTRACK.IVRS_ACURIAN_OUTPUT
       WHERE '${record.getAs[String]("IVRS_PROJECT_ID")}' = IVRS_PROJECT_ID 
@@ -242,6 +242,7 @@ object RmDump {
       println(s"======== KEY COUNT : ${forInsert.count}")
       println(record.schema.fieldNames)
       println(record)
+      //println(insertStatement.get)
       
       if (forInsert.count == 0) {
         insertStatement.execute
