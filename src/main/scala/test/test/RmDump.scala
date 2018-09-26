@@ -112,7 +112,7 @@ object RmDump {
     val dbc: Connection = DriverManager.getConnection(url)
     dbc.setAutoCommit(true)
 
-    dataToWrite.rdd.map(record => {
+    dataToWrite.rdd.foreach(record => {
 
       val updateQuery = s"""
       
