@@ -239,12 +239,13 @@ object RmDump {
       updateStatement.execute
       updateStatement.close
       val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
-//      println(s"======== KEY COUNT : ${forInsert.count}")
-//      println(record.schema.fieldNames)
-//      println(record)
+      //      println(s"======== KEY COUNT : ${forInsert.count}")
+      //      println(record.schema.fieldNames)
+      //      println(record)
       //println(insertStatement.get)
-      
-      if (forInsert.count == 0) {
+
+      if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null 
+          && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
         insertStatement.execute
         insertStatement.close
       }
