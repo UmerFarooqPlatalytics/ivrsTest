@@ -117,7 +117,7 @@ object RmDump {
         toDouble(noneCheck((jsonValue \ "ACURIAN_PATIENT_ID").asOpt[String])),
         noneCheck((jsonValue \ "ACURIAN_PROTOCOL_NUM").asOpt[String]),
         noneCheck((jsonValue \ "ACURIAN_SITE_ID").asOpt[String]),
-        intToDouble(noneCheckForInt((jsonValue \ "SYSTEM_RANK").asOpt[Int])),
+        toDouble(noneCheck((jsonValue \ "SYSTEM_RANK").asOpt[String])),
         toDouble(noneCheck((jsonValue \ "CONFIRMATION_METHOD_CD").asOpt[String])),
         convertToFormat(noneCheck((jsonValue \ "ACURIAN_CONSENTED_DT").asOpt[String]), dateFormat),
         convertToFormat(noneCheck((jsonValue \ "ACURIAN_RANDOMIZED_DT").asOpt[String]), dateFormat),
