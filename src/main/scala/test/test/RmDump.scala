@@ -60,6 +60,7 @@ object RmDump {
       }
 
       val noneCheckForInt = (value: Option[Int]) => {
+        println(Option[Int])
         if (value != None){
           println(value.get)
           println(int2Integer(value.get))
