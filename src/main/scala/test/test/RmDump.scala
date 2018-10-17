@@ -318,8 +318,8 @@ object RmDump {
 //        && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
 //        insertStatement.execute
 //        insertStatement.close
-//      }*/
-    })
+//      }
+    })*/
 
     dbc.close
   }
