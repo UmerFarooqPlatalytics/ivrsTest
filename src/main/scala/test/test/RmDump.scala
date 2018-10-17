@@ -165,7 +165,15 @@ object RmDump {
              IVRS_PROTOCOL_NUMBER,
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
       FROM table
-      """).show
+      """).show(353)
+      
+      sparkSession.sqlContext.sql(s"""
+      SELECT IVRS_PROJECT_ID,
+             IVRS_COUNTRY,
+             IVRS_PROTOCOL_NUMBER,
+             SYSTEM_RANK
+      FROM table
+      """).show(353)
 
     dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
@@ -299,15 +307,15 @@ object RmDump {
       insertStatement.setBigDecimal(36, record.getAs[java.math.BigDecimal]("SYSTEM_RANK"))
       insertStatement.setBigDecimal(37, record.getAs[java.math.BigDecimal]("CONFIRMATION_METHOD_CD"))
 
-      updateStatement.execute
-      updateStatement.close
-      val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
-
-      if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null
-        && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
-        insertStatement.execute
-        insertStatement.close
-      }
+//      updateStatement.execute
+//      updateStatement.close
+//      val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
+//
+//      if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null
+//        && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
+//        insertStatement.execute
+//        insertStatement.close
+//      }
     })
 
     dbc.close
