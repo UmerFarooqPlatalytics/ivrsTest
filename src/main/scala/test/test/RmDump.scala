@@ -32,7 +32,7 @@ object RmDump {
   def dumpIntoRm() = {
 
     val mongoConn = new MongoDBConnector
-    mongoConn.connect("172.16.248.23", "9876")
+    mongoConn.connect("ds-dev-node-04", "9876")
     val acurianStaging = mongoConn.getCollection("test", "acurianstagings")
     val dateFormat = "yyyy-MM-dd"
 
@@ -59,9 +59,23 @@ object RmDump {
           null
       }
 
+      val noneCheckForInt = (value: Option[Int]) => {
+        if (value != None)
+          int2Integer(value.get)
+        else
+          null
+      }
+
       val toDouble = (value: String) => {
         if (value != null) {
           new java.math.BigDecimal(value.replace("-", ""), MathContext.DECIMAL64)
+        } else
+          null
+      }
+
+      val intToDouble = (value: Integer) => {
+        if (value != null) {
+          new java.math.BigDecimal(value, MathContext.DECIMAL64)
         } else
           null
       }
@@ -99,6 +113,8 @@ object RmDump {
         toDouble(noneCheck((jsonValue \ "ACURIAN_PATIENT_ID").asOpt[String])),
         noneCheck((jsonValue \ "ACURIAN_PROTOCOL_NUM").asOpt[String]),
         noneCheck((jsonValue \ "ACURIAN_SITE_ID").asOpt[String]),
+        intToDouble(noneCheckForInt((jsonValue \ "SYSTEM_RANK").asOpt[Int])),
+        toDouble(noneCheck((jsonValue \ "CONFIRMATION_METHOD_CD").asOpt[String])),
         convertToFormat(noneCheck((jsonValue \ "ACURIAN_CONSENTED_DT").asOpt[String]), dateFormat),
         convertToFormat(noneCheck((jsonValue \ "ACURIAN_RANDOMIZED_DT").asOpt[String]), dateFormat),
         convertToFormat(noneCheck((jsonValue \ "ACURIAN_ENROLLED_DT").asOpt[String]), dateFormat),
@@ -110,7 +126,8 @@ object RmDump {
 
     dataToWrite.createOrReplaceTempView("table")
     var prop = new java.util.Properties
-    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+    //val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "prd-db-scan.acurian.com", "1521", "acuprd_app_numtra.acurian.com")
+    val url = getConnectionString("S_NUMTRA", "S_NUMTRA#2018", "dev-db-scan.acurian.com", "1521", "acuqa_users.acurian.com")
 
     val dbc: Connection = DriverManager.getConnection(url)
     dbc.setAutoCommit(true)
@@ -131,9 +148,9 @@ object RmDump {
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
              FROM table)
       GROUP BY IVRS_PROJECT_ID, IVRS_COUNTRY, IVRS_PROTOCOL_NUMBER      
-      """)
+      """)  
 
-    sparkSession.sqlContext.sql(s"""
+      sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
              IVRS_COUNTRY,
              IVRS_PROTOCOL_NUMBER,
@@ -141,15 +158,15 @@ object RmDump {
       FROM table
       WHERE SYSTEM_RANK > 0
       """).show
-
-    sparkSession.sqlContext.sql(s"""
+      
+      sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
              IVRS_COUNTRY,
              IVRS_PROTOCOL_NUMBER,
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
       FROM table
       """).show
-
+      
     dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
     dataToWrite.rdd.collect.foreach(record => {
@@ -187,15 +204,17 @@ object RmDump {
                   ACURIAN_CONSENTED_DT = ?,
                   ACURIAN_RANDOMIZED_DT = ?,
                   ACURIAN_ENROLLED_DT = ?,
-                  ACURIAN_RESOLVED_DT = ?
+                  ACURIAN_RESOLVED_DT = ?,
+                  MATCH_RANK = ?,
+                  CONFIRMATION_METHOD_CD = ?
     WHERE '${record.getAs[String]("IVRS_PROJECT_ID")}' = IVRS_PROJECT_ID 
       AND '${record.getAs[String]("IVRS_PROTOCOL_NUMBER")}' = IVRS_PROTOCOL_NUMBER
       AND '${record.getAs[String]("IVRS_PATIENT_ID")}' = IVRS_PATIENT_ID 
       AND '${record.getAs[String]("IVRS_COUNTRY")}' = IVRS_COUNTRY"""
 
       val insertQuery = """
-      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT (IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_GENDER, IVRS_COUNTRY, IVRS_PATIENT_F_INITIAL, IVRS_PATIENT_M_INITIAL, IVRS_PATIENT_L_INITIAL, IVRS_REGION, IVRS_DOB_DAY, IVRS_DOB_MONTH, IVRS_DOB_YEAR, IVRS_SITE_ID, IVRS_INVESTIGATOR_F_INITIAL, IVRS_INVESTIGATOR_M_INITIAL, IVRS_INVESTIGATOR_L_INITIAL, IVRS_DATE_SCREEN_FAILED, IVRS_DATE_PRE_SCREEN_FAILED, IVRS_DATE_DROPOUT, IVRS_DATE_PRE_SCREENED, IVRS_DATE_RANDOMIZATION_FAILED, IVRS_DATE_COMPLETED, IVRS_DATE_RE_SCREENED, IVRS_DATE_ENROLLMENT, IVRS_DATE_RANDOMIZED, IVRS_DATE_SCREENED, ACURIAN_PROJECT_ID, ACURIAN_SSID, ACURIAN_PATIENT_ID, ACURIAN_PROTOCOL_NUM, ACURIAN_SITE_ID, ACURIAN_CONSENTED_DT, ACURIAN_RANDOMIZED_DT, ACURIAN_ENROLLED_DT, ACURIAN_RESOLVED_DT)
-      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      INSERT INTO S_ACUTRACK.IVRS_ACURIAN_OUTPUT (IVRS_PROJECT_ID, IVRS_PROTOCOL_NUMBER, IVRS_PATIENT_ID, IVRS_GENDER, IVRS_COUNTRY, IVRS_PATIENT_F_INITIAL, IVRS_PATIENT_M_INITIAL, IVRS_PATIENT_L_INITIAL, IVRS_REGION, IVRS_DOB_DAY, IVRS_DOB_MONTH, IVRS_DOB_YEAR, IVRS_SITE_ID, IVRS_INVESTIGATOR_F_INITIAL, IVRS_INVESTIGATOR_M_INITIAL, IVRS_INVESTIGATOR_L_INITIAL, IVRS_DATE_SCREEN_FAILED, IVRS_DATE_PRE_SCREEN_FAILED, IVRS_DATE_DROPOUT, IVRS_DATE_PRE_SCREENED, IVRS_DATE_RANDOMIZATION_FAILED, IVRS_DATE_COMPLETED, IVRS_DATE_RE_SCREENED, IVRS_DATE_ENROLLMENT, IVRS_DATE_RANDOMIZED, IVRS_DATE_SCREENED, ACURIAN_PROJECT_ID, ACURIAN_SSID, ACURIAN_PATIENT_ID, ACURIAN_PROTOCOL_NUM, ACURIAN_SITE_ID, ACURIAN_CONSENTED_DT, ACURIAN_RANDOMIZED_DT, ACURIAN_ENROLLED_DT, ACURIAN_RESOLVED_DT, MATCH_RANK, CONFIRMATION_METHOD_CD)
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """
 
       val fetchQuery = s"""
@@ -240,6 +259,8 @@ object RmDump {
       updateStatement.setTimestamp(29, record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT"))
       updateStatement.setTimestamp(30, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
       updateStatement.setTimestamp(31, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
+      updateStatement.setBigDecimal(32, record.getAs[java.math.BigDecimal]("SYSTEM_RANK"))
+      updateStatement.setBigDecimal(33, record.getAs[java.math.BigDecimal]("CONFIRMATION_METHOD_CD"))
       insertStatement.setString(1, record.getAs[String]("IVRS_PROJECT_ID"))
       insertStatement.setString(2, record.getAs[String]("IVRS_PROTOCOL_NUMBER"))
       insertStatement.setString(3, record.getAs[String]("IVRS_PATIENT_ID"))
@@ -275,14 +296,12 @@ object RmDump {
       insertStatement.setTimestamp(33, record.getAs[Timestamp]("ACURIAN_RANDOMIZED_DT"))
       insertStatement.setTimestamp(34, record.getAs[Timestamp]("ACURIAN_ENROLLED_DT"))
       insertStatement.setTimestamp(35, record.getAs[Timestamp]("ACURIAN_RESOLVED_DT"))
+      insertStatement.setBigDecimal(36, record.getAs[java.math.BigDecimal]("SYSTEM_RANK"))
+      insertStatement.setBigDecimal(37, record.getAs[java.math.BigDecimal]("CONFIRMATION_METHOD_CD"))
 
       updateStatement.execute
       updateStatement.close
       val forInsert = sparkSession.sqlContext.read.jdbc(url, s"(${fetchQuery})", prop)
-      //      println(s"======== KEY COUNT : ${forInsert.count}")
-      //      println(record.schema.fieldNames)
-      //      println(record)
-      //println(insertStatement.get)
 
       if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null
         && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
