@@ -29,9 +29,19 @@ object App {
     
     import sparkSession.sqlContext.implicits._
     val df = sparkSession.sparkContext.parallelize(Array((1, 2), (3, 4), (1, 6))).toDF("age", "salary")
+    val df2 = sparkSession.sparkContext.parallelize(Array(("a", "b"), ("c", "d"), ("e", "f"))).toDF("age", "salary")
     
-    val t = df.select(df("age")).distinct.collect.map(_.toSeq.mkString).mkString(",")
-    println(t)
+    val broadCasted = sparkSession.sparkContext.broadcast(df2)
+    
+    val bb = df.rdd.map(record => {
+      val t = broadCasted.value
+      t.rdd.collect()(0)
+    })
+    
+    bb.foreach(println)
+    
+//    val t = df.select(df("age")).distinct.collect.map(_.toSeq.mkString).mkString(",")
+//    println(t)
     
     
 //    sparkSession.sqlContext.read

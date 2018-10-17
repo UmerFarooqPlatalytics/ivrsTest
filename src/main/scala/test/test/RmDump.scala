@@ -16,6 +16,9 @@ import org.apache.spark.sql.SaveMode
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement
+import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import com.mongodb.DBObject
 
 object RmDump {
 
@@ -111,6 +114,43 @@ object RmDump {
 
     val dbc: Connection = DriverManager.getConnection(url)
     dbc.setAutoCommit(true)
+
+    val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+    val now = LocalDateTime.now()
+    val curDate = dtf.format(now)
+    val updateSummary = sparkSession.sqlContext.sql(s"""
+      SELECT IVRS_PROJECT_ID,
+             IVRS_COUNTRY,
+             IVRS_PROTOCOL_NUMBER,
+             SUM (CASE SYSTEM_RANK WHEN 0 THEN 1 ELSE 0 END) as TOTAL_EXACT_MATCHES,
+             SUM (CASE SYSTEM_RANK WHEN SYSTEM_RANK > 0 THEN 1 ELSE 0 END) as TOTAL_CONFIRMED_MATCHES,
+             '${curDate}' as DATE_UPDATED
+      FROM (SELECT IVRS_PROJECT_ID,
+             IVRS_COUNTRY,
+             IVRS_PROTOCOL_NUMBER,
+             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
+             FROM table)
+      GROUP BY IVRS_PROJECT_ID, IVRS_COUNTRY, IVRS_PROTOCOL_NUMBER      
+      """)
+
+    sparkSession.sqlContext.sql(s"""
+      SELECT IVRS_PROJECT_ID,
+             IVRS_COUNTRY,
+             IVRS_PROTOCOL_NUMBER,
+             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
+      FROM table
+      WHERE SYSTEM_RANK > 0
+      """).show
+
+    sparkSession.sqlContext.sql(s"""
+      SELECT IVRS_PROJECT_ID,
+             IVRS_COUNTRY,
+             IVRS_PROTOCOL_NUMBER,
+             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
+      FROM table
+      """).show
+
+    dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
     dataToWrite.rdd.collect.foreach(record => {
 
@@ -244,8 +284,8 @@ object RmDump {
       //      println(record)
       //println(insertStatement.get)
 
-      if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null 
-          && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
+      if (forInsert.count == 0 && record.getAs[String]("IVRS_PROJECT_ID") != null && record.getAs[String]("IVRS_PROTOCOL_NUMBER") != null
+        && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
         insertStatement.execute
         insertStatement.close
       }
@@ -295,6 +335,20 @@ object RmDump {
       .add(StructField("ACURIAN_RANDOMIZED_DT", TimestampType, true))
       .add(StructField("ACURIAN_ENROLLED_DT", TimestampType, true))
       .add(StructField("ACURIAN_RESOLVED_DT", TimestampType, true))
+  }
+
+  def dumpForDashboard(data: DataFrame, collectionName: String) = {
+    data.toJSON.rdd.foreachPartition(partition => {
+      import sparkSession.implicits._
+      val mongoConn = new MongoDBConnector
+      mongoConn.connect("ds-dev-node-01.acurian.com", "9876")
+      val dataBase: com.mongodb.casbah.MongoDB = mongoConn.mongoClient("test")
+      val collection = dataBase(collectionName)
+      partition.foreach(jsonRow => {
+        val jsonRecord = com.mongodb.util.JSON.parse(jsonRow).asInstanceOf[DBObject]
+        collection.insert(jsonRecord)
+      })
+    })
   }
 
 }
