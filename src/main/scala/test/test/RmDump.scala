@@ -60,8 +60,11 @@ object RmDump {
       }
 
       val noneCheckForInt = (value: Option[Int]) => {
-        if (value != None)
+        if (value != None){
+          println(value.get)
+          println(int2Integer(value.get))
           int2Integer(value.get)
+        }
         else
           null
       }
@@ -177,7 +180,7 @@ object RmDump {
 
     dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
-    dataToWrite.rdd.collect.foreach(record => {
+   /* dataToWrite.rdd.collect.foreach(record => {
 
       val updateQuery = s"""
       
@@ -315,7 +318,7 @@ object RmDump {
 //        && record.getAs[String]("IVRS_PATIENT_ID") != null && record.getAs[String]("IVRS_COUNTRY") != null) {
 //        insertStatement.execute
 //        insertStatement.close
-//      }
+//      }*/
     })
 
     dbc.close
