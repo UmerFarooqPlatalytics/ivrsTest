@@ -362,7 +362,7 @@ object RmDump {
     data.toJSON.rdd.foreachPartition(partition => {
       import sparkSession.implicits._
       val mongoConn = new MongoDBConnector
-      mongoConn.connect("ds-dev-node-01.acurian.com", "9876")
+      mongoConn.connect("ds-dev-node-04", "9876")
       val dataBase: com.mongodb.casbah.MongoDB = mongoConn.mongoClient("test")
       val collection = dataBase(collectionName)
       partition.foreach(jsonRow => {
