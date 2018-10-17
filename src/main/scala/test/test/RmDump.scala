@@ -148,9 +148,9 @@ object RmDump {
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
              FROM table)
       GROUP BY IVRS_PROJECT_ID, IVRS_COUNTRY, IVRS_PROTOCOL_NUMBER      
-      """)  
+      """)
 
-      sparkSession.sqlContext.sql(s"""
+    sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
              IVRS_COUNTRY,
              IVRS_PROTOCOL_NUMBER,
@@ -158,15 +158,15 @@ object RmDump {
       FROM table
       WHERE SYSTEM_RANK > 0
       """).show
-      
-      sparkSession.sqlContext.sql(s"""
+
+    sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
              IVRS_COUNTRY,
              IVRS_PROTOCOL_NUMBER,
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
       FROM table
       """).show
-      
+
     dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
     dataToWrite.rdd.collect.foreach(record => {
@@ -350,6 +350,8 @@ object RmDump {
       .add(StructField("ACURIAN_PATIENT_ID", DecimalType(38, 10), true))
       .add(StructField("ACURIAN_PROTOCOL_NUM", StringType, true))
       .add(StructField("ACURIAN_SITE_ID", StringType, true))
+      .add(StructField("SYSTEM_RANK", DecimalType(38, 10), true))
+      .add(StructField("CONFIRMATION_METHOD_CD", DecimalType(38, 10), true))
       .add(StructField("ACURIAN_CONSENTED_DT", TimestampType, true))
       .add(StructField("ACURIAN_RANDOMIZED_DT", TimestampType, true))
       .add(StructField("ACURIAN_ENROLLED_DT", TimestampType, true))
