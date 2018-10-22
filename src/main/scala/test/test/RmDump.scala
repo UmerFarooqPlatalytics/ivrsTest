@@ -140,17 +140,17 @@ object RmDump {
     val now = LocalDateTime.now()
     val curDate = dtf.format(now)
     val updateSummary = sparkSession.sqlContext.sql(s"""
-      SELECT IVRS_PROJECT_ID,
-             IVRS_COUNTRY,
-             IVRS_PROTOCOL_NUMBER,
-             SUM (CASE SYSTEM_RANK WHEN 0 THEN 1 ELSE 0 END) as TOTAL_EXACT_MATCHES,
-             SUM (CASE SYSTEM_RANK WHEN SYSTEM_RANK > 0 THEN 1 ELSE 0 END) as TOTAL_CONFIRMED_MATCHES,
+      SELECT casted_data.IVRS_PROJECT_ID,
+             casted_data.IVRS_COUNTRY,
+             casted_data.IVRS_PROTOCOL_NUMBER,
+             SUM (CASE casted_data.SYSTEM_RANK WHEN 0 THEN 1 ELSE 0 END) as TOTAL_EXACT_MATCHES,
+             SUM (CASE WHEN casted_data.SYSTEM_RANK > 0 THEN 1 ELSE 0 END) as TOTAL_CONFIRMED_MATCHES,
              '${curDate}' as DATE_UPDATED
       FROM (SELECT IVRS_PROJECT_ID,
-             IVRS_COUNTRY,
-             IVRS_PROTOCOL_NUMBER,
-             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
-             FROM table)
+                   IVRS_COUNTRY,
+                   IVRS_PROTOCOL_NUMBER,
+                   CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
+             FROM table) as casted_data
       GROUP BY IVRS_PROJECT_ID, IVRS_COUNTRY, IVRS_PROTOCOL_NUMBER      
       """)
 
