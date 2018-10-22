@@ -144,7 +144,7 @@ object RmDump {
              casted_data.IVRS_COUNTRY,
              casted_data.IVRS_PROTOCOL_NUMBER,
              SUM (CASE casted_data.SYSTEM_RANK WHEN 0 THEN 1 ELSE 0 END) as TOTAL_EXACT_MATCHES,
-             SUM (CASE WHEN casted_data.SYSTEM_RANK > 0 THEN 1 ELSE 0 END) as TOTAL_CONFIRMED_MATCHES,
+             SUM (CASE WHEN casted_data.SYSTEM_RANK <> 0 AND casted_data.SYSTEM_RANK IS NOT NULL THEN 1 ELSE 0 END) as TOTAL_CONFIRMED_MATCHES,
              '${curDate}' as DATE_UPDATED
       FROM (SELECT IVRS_PROJECT_ID,
                    IVRS_COUNTRY,
