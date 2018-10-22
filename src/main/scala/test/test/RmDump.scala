@@ -154,14 +154,14 @@ object RmDump {
       GROUP BY IVRS_PROJECT_ID, IVRS_COUNTRY, IVRS_PROTOCOL_NUMBER      
       """)
 
-    sparkSession.sqlContext.sql(s"""
-      SELECT IVRS_PROJECT_ID,
-             IVRS_COUNTRY,
-             IVRS_PROTOCOL_NUMBER,
-             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
-      FROM table
-      WHERE SYSTEM_RANK > 0
-      """).show
+//    sparkSession.sqlContext.sql(s"""
+//      SELECT IVRS_PROJECT_ID,
+//             IVRS_COUNTRY,
+//             IVRS_PROTOCOL_NUMBER,
+//             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
+//      FROM table
+//      WHERE SYSTEM_RANK > 0
+//      """).show
 
     sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
@@ -169,15 +169,23 @@ object RmDump {
              IVRS_PROTOCOL_NUMBER,
              CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
       FROM table
-      """).show(353)
+      """).printSchema
       
       sparkSession.sqlContext.sql(s"""
       SELECT IVRS_PROJECT_ID,
              IVRS_COUNTRY,
              IVRS_PROTOCOL_NUMBER,
-             SYSTEM_RANK
+             CAST(FLOOR(SYSTEM_RANK) AS INT) as SYSTEM_RANK
       FROM table
-      """).show(353)
+      """).show
+      
+//      sparkSession.sqlContext.sql(s"""
+//      SELECT IVRS_PROJECT_ID,
+//             IVRS_COUNTRY,
+//             IVRS_PROTOCOL_NUMBER,
+//             SYSTEM_RANK
+//      FROM table
+//      """).show(353)
 
     dumpForDashboard(updateSummary, "acurianupdatesummaries")
 
