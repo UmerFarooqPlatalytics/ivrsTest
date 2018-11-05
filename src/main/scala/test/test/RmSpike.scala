@@ -292,12 +292,12 @@ object RmSpike {
       .save("/spikeTest")
       
       
-    val writtenData = sparkSession.sqlContext.read
+    val writtenData = sparkSession.sqlContext.applySchema(sparkSession.sqlContext.read
         .format("com.databricks.spark.csv")
         .option("inferSchema", "true")
         .option("header", "true")
         .option("delimiter", ",")
-        .load("/spikeTest")
+        .load("/spikeTest").rdd, df.schema)
         
     writtenData.printSchema    
     
