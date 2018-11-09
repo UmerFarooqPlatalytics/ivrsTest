@@ -276,7 +276,7 @@ object Constants {
   val LOAD_FROM_HDFS: String = "hdfs"
 
   /** resource settings **/
-  var NAME_NODE: String = null
+  var NAME_NODE: String = "ds-dev-node-01:9000"
   //  var JOB_TRACKER: String = null
   //  var OOZIE_URL: String = null
   //  var SQOOP_URL: String = null
