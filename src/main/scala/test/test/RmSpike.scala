@@ -873,7 +873,7 @@ object RmSpike {
         record.getAs[String](Constants.IVRS_PROTOCOL_NUMBER), //IVRS Protocol Number
         record.getAs[String](Constants.ACURIAN_COUNTRY), //Acurian Country
         record.getAs[String](Constants.IVRS_COUNTRY), //IVRS Country
-        record.getAs[java.math.BigDecimal](Constants.ACURIAN_PATIENT_ID), // Acurian Patient ID
+        BigDecimal(record.getAs[String](Constants.ACURIAN_PATIENT_ID)), // Acurian Patient ID
         record.getAs[String](Constants.IVRS_PATIENT_ID), //IVRS Screening ID
         record.getAs[String](Constants.IVRS_REGION), //IVRS Screening ID
         acurianDobD, //Acurian DOB day
