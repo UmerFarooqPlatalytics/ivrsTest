@@ -9,8 +9,7 @@ import play.api.libs.json.Json
 import com.mongodb.BasicDBObject
 import com.mongodb.casbah.MongoCollection
 
-
-class MongoDBConnector{
+class MongoDBConnector {
   var mongoClient: MongoClient = _
   /**
    * creates connection
@@ -22,6 +21,26 @@ class MongoDBConnector{
    */
   def connect(dbAddress: String, port: String) {
     mongoClient = MongoClient(dbAddress, port.toInt)
+  }
+
+  def updateAcurianStagingRecord(dbName: String, collectionName: String, kv: Map[String, Any], patientID: String,
+                                 protocol: String, project: String, country: String) = {
+    val db: com.mongodb.casbah.MongoDB = mongoClient(dbName)
+    val coll = db(collectionName)
+
+    //val objectId: ObjectId = new ObjectId(objId)
+    val query = MongoDBObject("IVRS_PATIENT_ID" -> patientID,
+      "IVRS_PROTOCOL_NUMBER" -> protocol,
+      "IVRS_PROJECT_ID" -> project,
+      "IVRS_COUNTRY" -> country)
+
+    val builder = MongoDBObject.newBuilder
+    kv.foreach(p => {
+      builder += p._1 -> { if (p._2 != null) p._2.toString else p._2 }
+    })
+
+    val newObj = builder.result
+    coll.update(query, newObj, true)
   }
 
   def getRecordsById(dbName: String, collectionName: String, objId: String): String = {
@@ -118,7 +137,6 @@ class MongoDBConnector{
     val query = MongoDBObject(key -> value)
     coll.findAndRemove(query)
   }
-
 
   def closeMongoClient() {
     if (mongoClient != null) {
