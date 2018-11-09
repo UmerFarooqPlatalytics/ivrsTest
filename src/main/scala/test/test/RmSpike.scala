@@ -864,11 +864,6 @@ object RmSpike {
       if (alreadyMatchMatch == true) {
         recordRank = 0
       }
-
-      
-      println("+++++++++++++++++++")
-      println(BigDecimal(record.getAs[Integer](Constants.ACURIAN_PATIENT_ID)))
-      println("+++++++++++++++++++")
       
       Row.fromSeq(Seq(record.getAs[String](Constants.ACURIAN_SCREENING_ID), // Acurian Project ID
         record.getAs[String](Constants.ACURIAN_PROJECT_ID), // Acurian Project ID
@@ -878,7 +873,7 @@ object RmSpike {
         record.getAs[String](Constants.IVRS_PROTOCOL_NUMBER), //IVRS Protocol Number
         record.getAs[String](Constants.ACURIAN_COUNTRY), //Acurian Country
         record.getAs[String](Constants.IVRS_COUNTRY), //IVRS Country
-        BigDecimal(record.getAs[Integer](Constants.ACURIAN_PATIENT_ID)), // Acurian Patient ID
+       record.getAs[String](Constants.ACURIAN_PATIENT_ID), // Acurian Patient ID
         record.getAs[String](Constants.IVRS_PATIENT_ID), //IVRS Screening ID
         record.getAs[String](Constants.IVRS_REGION), //IVRS Screening ID
         acurianDobD, //Acurian DOB day
@@ -1552,7 +1547,7 @@ object RmSpike {
       .add(StructField("ivrs_protocol_number", StringType, true))
       .add(StructField("acurian_country", StringType, true))
       .add(StructField("ivrs_country", StringType, true))
-      .add(StructField("acurian_patient_id", DecimalType(38, 10), true))
+      .add(StructField("acurian_patient_id", StringType, true))
       .add(StructField("ivrs_patient_id", StringType, true))
       .add(StructField("ivrs_region", StringType, true))
       .add(StructField("acurian_dob_d", StringType, true))
