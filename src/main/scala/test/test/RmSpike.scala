@@ -865,6 +865,11 @@ object RmSpike {
         recordRank = 0
       }
 
+      
+      println("+++++++++++++++++++")
+      println(BigDecimal(record.getAs[Integer](Constants.ACURIAN_PATIENT_ID)))
+      println("+++++++++++++++++++")
+      
       Row.fromSeq(Seq(record.getAs[String](Constants.ACURIAN_SCREENING_ID), // Acurian Project ID
         record.getAs[String](Constants.ACURIAN_PROJECT_ID), // Acurian Project ID
         record.getAs[String](Constants.IVRS_PROJECT_ID), // IVRS Project ID
