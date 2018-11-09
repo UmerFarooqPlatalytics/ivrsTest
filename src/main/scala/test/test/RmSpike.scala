@@ -110,11 +110,12 @@ object RmSpike {
 
     val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
     val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
+    matches.show
     matches.createOrReplaceTempView("rankedData")
 
-    matches.rdd.map(matched => {
-
-    })
+//    matches.rdd.map(matched => {
+//
+//    })
 
     val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
