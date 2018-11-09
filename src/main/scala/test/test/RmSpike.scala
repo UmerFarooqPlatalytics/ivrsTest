@@ -51,7 +51,7 @@ object RmSpike {
   val hdfsPath = "hdfs://ds-dev-node-01:9000"
 
   def main(args: Array[String]) {
-    run("", 0)
+    run("3889-M14_431-US-20181105.csv", 1)
   }
 
   def run(ivrsFileName: String, headerLines: Int): DataFrame = {
