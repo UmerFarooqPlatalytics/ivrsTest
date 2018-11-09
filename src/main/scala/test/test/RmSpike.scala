@@ -660,13 +660,9 @@ object RmSpike {
       var siteIdMatch = "missing"
       var investiNameMatch = "missing"
 
-      val acurianDobD = Try(record.getAs[String](Constants.ACURIAN_DOB_DAY).toString) getOrElse null
-      val acurianDobM = Try(record.getAs[String](Constants.ACURIAN_DOB_MONTH).toString) getOrElse null
-      val acurianDobY = Try(record.getAs[String](Constants.ACURIAN_DOB_YEAR).toString) getOrElse null
-
-      println(s"acurianDobD: ${acurianDobD}")
-      println(s"acurianDobM: ${acurianDobM}")
-      println(s"acurianDobY: ${acurianDobY}")
+      val acurianDobD = Try(record.getAs[Int](Constants.ACURIAN_DOB_DAY).toString) getOrElse null
+      val acurianDobM = Try(record.getAs[Int](Constants.ACURIAN_DOB_MONTH).toString) getOrElse null
+      val acurianDobY = Try(record.getAs[Int](Constants.ACURIAN_DOB_YEAR).toString) getOrElse null
 
       val acurianPtFI = Try(record.getAs[String](Constants.ACURIAN_PATIENT_F_INITIAL).replaceAll("\\s", "")(0).toString) getOrElse null
       val acurianPtMI = Try(record.getAs[String](Constants.ACURIAN_PATIENT_M_INITIAL).replaceAll("\\s", "")(0).toString) getOrElse null
@@ -680,6 +676,9 @@ object RmSpike {
       val acurianInvstMName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_M_NAME).replaceAll("\\s", "")) getOrElse null
       val acurianInvstLName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_L_NAME).replaceAll("\\s", "")) getOrElse null
 
+      println(s"acurianDobD: ${acurianDobD}")
+      println(s"acurianDobM: ${acurianDobM}")
+      println(s"acurianDobY: ${acurianDobY}")
       println(s"acurianPtFI: ${acurianPtFI}")
       println(s"acurianPtMI: ${acurianPtMI}")
       println(s"acurianPtLI: ${acurianPtLI}")
