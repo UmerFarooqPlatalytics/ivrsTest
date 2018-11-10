@@ -113,9 +113,9 @@ object RmSpike {
     matches.show
     matches.createOrReplaceTempView("rankedData")
 
-//    matches.rdd.map(matched => {
-//
-//    })
+    //    matches.rdd.map(matched => {
+    //
+    //    })
 
     val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
@@ -688,7 +688,7 @@ object RmSpike {
       println(s"acurianInvstMName: ${acurianInvstMName}")
       println(s"acurianInvstLName: ${acurianInvstLName}")
       println("===================================================")
-      
+
       /**
        * DOB Match
        */
@@ -864,6 +864,7 @@ object RmSpike {
       if (alreadyMatchMatch == true) {
         recordRank = 0
       }
+
       
       Row.fromSeq(Seq(record.getAs[String](Constants.ACURIAN_SCREENING_ID), // Acurian Project ID
         record.getAs[String](Constants.ACURIAN_PROJECT_ID), // Acurian Project ID
@@ -873,7 +874,7 @@ object RmSpike {
         record.getAs[String](Constants.IVRS_PROTOCOL_NUMBER), //IVRS Protocol Number
         record.getAs[String](Constants.ACURIAN_COUNTRY), //Acurian Country
         record.getAs[String](Constants.IVRS_COUNTRY), //IVRS Country
-       record.getAs[String](Constants.ACURIAN_PATIENT_ID), // Acurian Patient ID
+        record.getAs[String](Constants.ACURIAN_PATIENT_ID), // Acurian Patient ID
         record.getAs[String](Constants.IVRS_PATIENT_ID), //IVRS Screening ID
         record.getAs[String](Constants.IVRS_REGION), //IVRS Screening ID
         acurianDobD, //Acurian DOB day
@@ -889,7 +890,7 @@ object RmSpike {
         ivrsGender, //IVRS Gender
         ivrsPtFI, //IVRS Patient First Initial
         ivrsPtMI, //IVRS Patient Middle Initial
-        ivrsPtLI, //IVRS Patient Last Initial
+        ivrsPtLI/*, //IVRS Patient Last Initial
         ivrsInvstFName, //IVRS inv first name
         ivrsInvstMName, //IVRS inv middle name
         ivrsInvstLName, //IVRS inv last name
@@ -917,7 +918,7 @@ object RmSpike {
         "", //ivrs mapped site no
         recordRank,
         rule,
-        ivrsFileName))
+        ivrsFileName*/))
 
     })
 
@@ -1564,34 +1565,34 @@ object RmSpike {
       .add(StructField("ivrs_pt_fi", StringType, true))
       .add(StructField("ivrs_pt_mi", StringType, true))
       .add(StructField("ivrs_pt_li", StringType, true))
-      .add(StructField("ivrs_invst_f_name", StringType, true))
-      .add(StructField("ivrs_invst_m_name", StringType, true))
-      .add(StructField("ivrs_invst_l_name", StringType, true))
-      .add(StructField("acurian_invst_f_name", StringType, true))
-      .add(StructField("acurian_invst_m_name", StringType, true))
-      .add(StructField("acurian_invst_l_name", StringType, true))
-      .add(StructField("ivrs_date_screened", TimestampType, true))
-      .add(StructField("ivrs_date_screen_failed", TimestampType, true))
-      .add(StructField("ivrs_date_randomized", TimestampType, true))
-      .add(StructField("ivrs_date_completed", TimestampType, true))
-      .add(StructField("ivrs_date_re_screened", TimestampType, true))
-      .add(StructField("ivrs_date_pre_screened", TimestampType, true))
-      .add(StructField("ivrs_date_randomization_failed", TimestampType, true))
-      .add(StructField("ivrs_date_pre_screened_failed", TimestampType, true))
-      .add(StructField("ivrs_date_enrollment", TimestampType, true))
-      .add(StructField("ivrs_date_dropout", TimestampType, true))
-      .add(StructField("acurian_released_date", TimestampType, true))
-      .add(StructField("acurian_enroll_date", TimestampType, true))
-      .add(StructField("acurian_fov_date", TimestampType, true))
-      .add(StructField("acurian_resolve_date", TimestampType, true))
-      .add(StructField("acurian_consent_date", TimestampType, true))
-      .add(StructField("acurian_rand_date", TimestampType, true))
-      .add(StructField("acurian_site_id", StringType, true))
-      .add(StructField("ivrs_site_id", StringType, true))
-      .add(StructField("mapped_site_no", StringType, true))
-      .add(StructField("system_rank", IntegerType, true))
-      .add(StructField("rule", StringType, true))
-      .add(StructField("ivrs_file_name", StringType, true))
+//      .add(StructField("ivrs_invst_f_name", StringType, true))
+//      .add(StructField("ivrs_invst_m_name", StringType, true))
+//      .add(StructField("ivrs_invst_l_name", StringType, true))
+//      .add(StructField("acurian_invst_f_name", StringType, true))
+//      .add(StructField("acurian_invst_m_name", StringType, true))
+//      .add(StructField("acurian_invst_l_name", StringType, true))
+//      .add(StructField("ivrs_date_screened", TimestampType, true))
+//      .add(StructField("ivrs_date_screen_failed", TimestampType, true))
+//      .add(StructField("ivrs_date_randomized", TimestampType, true))
+//      .add(StructField("ivrs_date_completed", TimestampType, true))
+//      .add(StructField("ivrs_date_re_screened", TimestampType, true))
+//      .add(StructField("ivrs_date_pre_screened", TimestampType, true))
+//      .add(StructField("ivrs_date_randomization_failed", TimestampType, true))
+//      .add(StructField("ivrs_date_pre_screened_failed", TimestampType, true))
+//      .add(StructField("ivrs_date_enrollment", TimestampType, true))
+//      .add(StructField("ivrs_date_dropout", TimestampType, true))
+//      .add(StructField("acurian_released_date", TimestampType, true))
+//      .add(StructField("acurian_enroll_date", TimestampType, true))
+//      .add(StructField("acurian_fov_date", TimestampType, true))
+//      .add(StructField("acurian_resolve_date", TimestampType, true))
+//      .add(StructField("acurian_consent_date", TimestampType, true))
+//      .add(StructField("acurian_rand_date", TimestampType, true))
+//      .add(StructField("acurian_site_id", StringType, true))
+//      .add(StructField("ivrs_site_id", StringType, true))
+//      .add(StructField("mapped_site_no", StringType, true))
+//      .add(StructField("system_rank", IntegerType, true))
+//      .add(StructField("rule", StringType, true))
+//      .add(StructField("ivrs_file_name", StringType, true))
   }
 
   def getConnectionString(userName: String, password: String, host: String, port: String, dbName: String): String = {
