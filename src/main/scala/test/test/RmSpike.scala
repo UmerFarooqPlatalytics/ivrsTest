@@ -108,166 +108,167 @@ object RmSpike {
 
     updateInStaging(tempDataForStagingTable)
 
-    val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
-    val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
-    matches.show
-    matches.createOrReplaceTempView("rankedData")
+    val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData).collect //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
+//    val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
+//    matches.show
+//    matches.createOrReplaceTempView("rankedData")
+//
+//    //    matches.rdd.map(matched => {
+//    //
+//    //    })
+//
+//    val exactMatches = sql.sql(s"""
+//         SELECT acurian_screening_id as ACURIAN_SSID,
+//                acurian_project_id as ACURIAN_PROJECT_ID, 
+//                ivrs_project_id as IVRS_PROJECT_ID, 
+//                acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
+//                ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
+//                ivrs_country as IVRS_COUNTRY,
+//                acurian_patient_id as ACURIAN_PATIENT_ID, 
+//                ivrs_patient_id as IVRS_PATIENT_ID,
+//                ivrs_dob_d as IVRS_DOB_DAY, 
+//                ivrs_dob_m as IVRS_DOB_MONTH,
+//                ivrs_dob_y as IVRS_DOB_YEAR, 
+//                ivrs_gender as IVRS_GENDER, 
+//                ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
+//                ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
+//                ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
+//                ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
+//                ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
+//                ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
+//                ivrs_date_screened as IVRS_DATE_SCREENED,
+//                ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
+//                ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
+//                ivrs_date_completed as IVRS_DATE_COMPLETED, 
+//                ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
+//                ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
+//                ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
+//                ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
+//                ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
+//                ivrs_date_dropout as IVRS_DATE_DROPOUT, 
+//                acurian_enroll_date as ACURIAN_ENROLLED_DT,
+//                acurian_resolve_date as ACURIAN_RESOLVED_DT,
+//                acurian_consent_date as ACURIAN_CONSENTED_DT, 
+//                acurian_rand_date as ACURIAN_RANDOMIZED_DT,
+//                acurian_site_id as ACURIAN_SITE_ID, 
+//                ivrs_site_id as IVRS_SITE_ID, 
+//                ivrs_region as IVRS_REGION,
+//                system_rank as SYSTEM_RANK,
+//                ivrs_file_name as IVRS_FILE_NAME,
+//                '1' as CONFIRMATION_METHOD_CD
+//         FROM   rankedData
+//         WHERE  system_rank = 0
+//         """)
+//
+//    //    matches.take(100).foreach(println)     
+//    updateInStaging(exactMatches)
+//
+//    val stagingTable = null
+//
+//    sql.sql("""
+//      SELECT rankedData.* 
+//      FROM rankedData
+//      JOIN(SELECT ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country, MIN(system_rank) as mrank
+//      FROM rankedData
+//      GROUP BY ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country
+//      ) AS minrank ON rankedData.ivrs_project_id = minrank.ivrs_project_id AND 
+//      rankedData.ivrs_patient_id = minrank.ivrs_patient_id AND
+//      rankedData.ivrs_protocol_number = minrank.ivrs_protocol_number AND
+//      rankedData.ivrs_country = minrank.ivrs_country AND
+//      rankedData.system_rank = minrank.mrank
+//      """).createOrReplaceTempView("forUniqueAcr")
+//
+//    sql.sql("""
+//      SELECT forUniqueAcr.* 
+//      FROM forUniqueAcr
+//      JOIN(SELECT acurian_patient_id, MIN(system_rank) as mrank
+//      FROM forUniqueAcr
+//      GROUP BY acurian_patient_id
+//      ) AS minrank ON forUniqueAcr.acurian_patient_id = minrank.acurian_patient_id AND
+//      forUniqueAcr.system_rank = minrank.mrank
+//      """).createOrReplaceTempView("toRemoveCrossStudy")
+//
+//    val ranksApplied = sql.sql("""
+//        SELECT * 
+//        FROM toRemoveCrossStudy 
+//        WHERE
+//        ivrs_project_id IN (SELECT ivrs_project_id 
+//                             FROM toRemoveCrossStudy 
+//                             GROUP BY ivrs_project_id 
+//                             having count(ivrs_project_id) = 1)
+//        OR
+//        ivrs_project_id IN (SELECT ivrs_project_id 
+//                             FROM toRemoveCrossStudy 
+//                             GROUP BY ivrs_project_id
+//                             HAVING SUM(CASE WHEN acurian_project_id = acurian_project_id
+//                                             THEN 1 ELSE 0 END) = 0)
+//        OR ivrs_project_id = acurian_project_id
+//        """)
+//
+//    //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
+//
+//    val rejectedRecordsRemoved = removeRejectedRecords(ranksApplied.filter(ranksApplied("system_rank") !== 0))
+//
+//    val rankedStats = calculateStats(rejectedRecordsRemoved)
+//
+//    val dashBoardFiltered = dashBoardFilter(rankedStats, rankThreshold)
+//
+//    dumpForDashboard(dashBoardFiltered._2, "dashboardfilerecords")
+//    dashBoardFiltered._1.createOrReplaceTempView("output")
+//
+//    val autoMatch = sql.sql(s"""
+//     
+//     SELECT acurian_screening_id as ACURIAN_SSID,
+//            acurian_project_id as ACURIAN_PROJECT_ID, 
+//            ivrs_project_id as IVRS_PROJECT_ID, 
+//            acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
+//            ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
+//            ivrs_country as IVRS_COUNTRY,
+//            acurian_patient_id as ACURIAN_PATIENT_ID, 
+//            ivrs_patient_id as IVRS_PATIENT_ID,
+//            ivrs_dob_d as IVRS_DOB_DAY, 
+//            ivrs_dob_m as IVRS_DOB_MONTH,
+//            ivrs_dob_y as IVRS_DOB_YEAR, 
+//            ivrs_gender as IVRS_GENDER, 
+//            ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
+//            ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
+//            ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
+//            ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
+//            ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
+//            ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
+//            ivrs_date_screened as IVRS_DATE_SCREENED,
+//            ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
+//            ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
+//            ivrs_date_completed as IVRS_DATE_COMPLETED, 
+//            ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
+//            ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
+//            ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
+//            ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
+//            ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
+//            ivrs_date_dropout as IVRS_DATE_DROPOUT, 
+//            acurian_enroll_date as ACURIAN_ENROLLED_DT,
+//            acurian_resolve_date as ACURIAN_RESOLVED_DT,
+//            acurian_consent_date as ACURIAN_CONSENTED_DT, 
+//            acurian_rand_date as ACURIAN_RANDOMIZED_DT,
+//            acurian_site_id as ACURIAN_SITE_ID, 
+//            ivrs_site_id as IVRS_SITE_ID, 
+//            ivrs_region as IVRS_REGION,
+//            system_rank as SYSTEM_RANK,
+//            ivrs_file_name as IVRS_FILE_NAME,
+//            '2' as CONFIRMATION_METHOD_CD
+//     FROM   output
+//     """)
+//
+//    updateInStaging(autoMatch)
+//
+//    val fileToDelete = hdfsPath + "/acurianData/" + ivrsFileName.split('.')(0) + ".csv"
+//    val fs = FileSystem.get(HDFSFactory.conf)
+//    if (fs.exists(new Path(fileToDelete)))
+//      fs.delete(new Path(fileToDelete), true)
+//
+//    dashBoardFiltered._2
 
-    //    matches.rdd.map(matched => {
-    //
-    //    })
-
-    val exactMatches = sql.sql(s"""
-         SELECT acurian_screening_id as ACURIAN_SSID,
-                acurian_project_id as ACURIAN_PROJECT_ID, 
-                ivrs_project_id as IVRS_PROJECT_ID, 
-                acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
-                ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
-                ivrs_country as IVRS_COUNTRY,
-                acurian_patient_id as ACURIAN_PATIENT_ID, 
-                ivrs_patient_id as IVRS_PATIENT_ID,
-                ivrs_dob_d as IVRS_DOB_DAY, 
-                ivrs_dob_m as IVRS_DOB_MONTH,
-                ivrs_dob_y as IVRS_DOB_YEAR, 
-                ivrs_gender as IVRS_GENDER, 
-                ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
-                ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
-                ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
-                ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
-                ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
-                ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
-                ivrs_date_screened as IVRS_DATE_SCREENED,
-                ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
-                ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
-                ivrs_date_completed as IVRS_DATE_COMPLETED, 
-                ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
-                ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
-                ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
-                ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
-                ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
-                ivrs_date_dropout as IVRS_DATE_DROPOUT, 
-                acurian_enroll_date as ACURIAN_ENROLLED_DT,
-                acurian_resolve_date as ACURIAN_RESOLVED_DT,
-                acurian_consent_date as ACURIAN_CONSENTED_DT, 
-                acurian_rand_date as ACURIAN_RANDOMIZED_DT,
-                acurian_site_id as ACURIAN_SITE_ID, 
-                ivrs_site_id as IVRS_SITE_ID, 
-                ivrs_region as IVRS_REGION,
-                system_rank as SYSTEM_RANK,
-                ivrs_file_name as IVRS_FILE_NAME,
-                '1' as CONFIRMATION_METHOD_CD
-         FROM   rankedData
-         WHERE  system_rank = 0
-         """)
-
-    //    matches.take(100).foreach(println)     
-    updateInStaging(exactMatches)
-
-    val stagingTable = null
-
-    sql.sql("""
-      SELECT rankedData.* 
-      FROM rankedData
-      JOIN(SELECT ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country, MIN(system_rank) as mrank
-      FROM rankedData
-      GROUP BY ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country
-      ) AS minrank ON rankedData.ivrs_project_id = minrank.ivrs_project_id AND 
-      rankedData.ivrs_patient_id = minrank.ivrs_patient_id AND
-      rankedData.ivrs_protocol_number = minrank.ivrs_protocol_number AND
-      rankedData.ivrs_country = minrank.ivrs_country AND
-      rankedData.system_rank = minrank.mrank
-      """).createOrReplaceTempView("forUniqueAcr")
-
-    sql.sql("""
-      SELECT forUniqueAcr.* 
-      FROM forUniqueAcr
-      JOIN(SELECT acurian_patient_id, MIN(system_rank) as mrank
-      FROM forUniqueAcr
-      GROUP BY acurian_patient_id
-      ) AS minrank ON forUniqueAcr.acurian_patient_id = minrank.acurian_patient_id AND
-      forUniqueAcr.system_rank = minrank.mrank
-      """).createOrReplaceTempView("toRemoveCrossStudy")
-
-    val ranksApplied = sql.sql("""
-        SELECT * 
-        FROM toRemoveCrossStudy 
-        WHERE
-        ivrs_project_id IN (SELECT ivrs_project_id 
-                             FROM toRemoveCrossStudy 
-                             GROUP BY ivrs_project_id 
-                             having count(ivrs_project_id) = 1)
-        OR
-        ivrs_project_id IN (SELECT ivrs_project_id 
-                             FROM toRemoveCrossStudy 
-                             GROUP BY ivrs_project_id
-                             HAVING SUM(CASE WHEN acurian_project_id = acurian_project_id
-                                             THEN 1 ELSE 0 END) = 0)
-        OR ivrs_project_id = acurian_project_id
-        """)
-
-    //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
-
-    val rejectedRecordsRemoved = removeRejectedRecords(ranksApplied.filter(ranksApplied("system_rank") !== 0))
-
-    val rankedStats = calculateStats(rejectedRecordsRemoved)
-
-    val dashBoardFiltered = dashBoardFilter(rankedStats, rankThreshold)
-
-    dumpForDashboard(dashBoardFiltered._2, "dashboardfilerecords")
-    dashBoardFiltered._1.createOrReplaceTempView("output")
-
-    val autoMatch = sql.sql(s"""
-     
-     SELECT acurian_screening_id as ACURIAN_SSID,
-            acurian_project_id as ACURIAN_PROJECT_ID, 
-            ivrs_project_id as IVRS_PROJECT_ID, 
-            acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
-            ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
-            ivrs_country as IVRS_COUNTRY,
-            acurian_patient_id as ACURIAN_PATIENT_ID, 
-            ivrs_patient_id as IVRS_PATIENT_ID,
-            ivrs_dob_d as IVRS_DOB_DAY, 
-            ivrs_dob_m as IVRS_DOB_MONTH,
-            ivrs_dob_y as IVRS_DOB_YEAR, 
-            ivrs_gender as IVRS_GENDER, 
-            ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
-            ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
-            ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
-            ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
-            ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
-            ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
-            ivrs_date_screened as IVRS_DATE_SCREENED,
-            ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
-            ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
-            ivrs_date_completed as IVRS_DATE_COMPLETED, 
-            ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
-            ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
-            ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
-            ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
-            ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
-            ivrs_date_dropout as IVRS_DATE_DROPOUT, 
-            acurian_enroll_date as ACURIAN_ENROLLED_DT,
-            acurian_resolve_date as ACURIAN_RESOLVED_DT,
-            acurian_consent_date as ACURIAN_CONSENTED_DT, 
-            acurian_rand_date as ACURIAN_RANDOMIZED_DT,
-            acurian_site_id as ACURIAN_SITE_ID, 
-            ivrs_site_id as IVRS_SITE_ID, 
-            ivrs_region as IVRS_REGION,
-            system_rank as SYSTEM_RANK,
-            ivrs_file_name as IVRS_FILE_NAME,
-            '2' as CONFIRMATION_METHOD_CD
-     FROM   output
-     """)
-
-    updateInStaging(autoMatch)
-
-    val fileToDelete = hdfsPath + "/acurianData/" + ivrsFileName.split('.')(0) + ".csv"
-    val fs = FileSystem.get(HDFSFactory.conf)
-    if (fs.exists(new Path(fileToDelete)))
-      fs.delete(new Path(fileToDelete), true)
-
-    dashBoardFiltered._2
-
+    null
   }
 
   def updateInStaging(data: DataFrame) = {
@@ -890,7 +891,7 @@ object RmSpike {
         ivrsGender, //IVRS Gender
         ivrsPtFI, //IVRS Patient First Initial
         ivrsPtMI, //IVRS Patient Middle Initial
-        ivrsPtLI/*, //IVRS Patient Last Initial
+        ivrsPtLI, //IVRS Patient Last Initial
         ivrsInvstFName, //IVRS inv first name
         ivrsInvstMName, //IVRS inv middle name
         ivrsInvstLName, //IVRS inv last name
@@ -918,7 +919,7 @@ object RmSpike {
         "", //ivrs mapped site no
         recordRank,
         rule,
-        ivrsFileName*/))
+        ivrsFileName))
 
     })
 
@@ -1565,34 +1566,34 @@ object RmSpike {
       .add(StructField("ivrs_pt_fi", StringType, true))
       .add(StructField("ivrs_pt_mi", StringType, true))
       .add(StructField("ivrs_pt_li", StringType, true))
-//      .add(StructField("ivrs_invst_f_name", StringType, true))
-//      .add(StructField("ivrs_invst_m_name", StringType, true))
-//      .add(StructField("ivrs_invst_l_name", StringType, true))
-//      .add(StructField("acurian_invst_f_name", StringType, true))
-//      .add(StructField("acurian_invst_m_name", StringType, true))
-//      .add(StructField("acurian_invst_l_name", StringType, true))
-//      .add(StructField("ivrs_date_screened", TimestampType, true))
-//      .add(StructField("ivrs_date_screen_failed", TimestampType, true))
-//      .add(StructField("ivrs_date_randomized", TimestampType, true))
-//      .add(StructField("ivrs_date_completed", TimestampType, true))
-//      .add(StructField("ivrs_date_re_screened", TimestampType, true))
-//      .add(StructField("ivrs_date_pre_screened", TimestampType, true))
-//      .add(StructField("ivrs_date_randomization_failed", TimestampType, true))
-//      .add(StructField("ivrs_date_pre_screened_failed", TimestampType, true))
-//      .add(StructField("ivrs_date_enrollment", TimestampType, true))
-//      .add(StructField("ivrs_date_dropout", TimestampType, true))
-//      .add(StructField("acurian_released_date", TimestampType, true))
-//      .add(StructField("acurian_enroll_date", TimestampType, true))
-//      .add(StructField("acurian_fov_date", TimestampType, true))
-//      .add(StructField("acurian_resolve_date", TimestampType, true))
-//      .add(StructField("acurian_consent_date", TimestampType, true))
-//      .add(StructField("acurian_rand_date", TimestampType, true))
-//      .add(StructField("acurian_site_id", StringType, true))
-//      .add(StructField("ivrs_site_id", StringType, true))
-//      .add(StructField("mapped_site_no", StringType, true))
-//      .add(StructField("system_rank", IntegerType, true))
-//      .add(StructField("rule", StringType, true))
-//      .add(StructField("ivrs_file_name", StringType, true))
+      .add(StructField("ivrs_invst_f_name", StringType, true))
+      .add(StructField("ivrs_invst_m_name", StringType, true))
+      .add(StructField("ivrs_invst_l_name", StringType, true))
+      .add(StructField("acurian_invst_f_name", StringType, true))
+      .add(StructField("acurian_invst_m_name", StringType, true))
+      .add(StructField("acurian_invst_l_name", StringType, true))
+      .add(StructField("ivrs_date_screened", TimestampType, true))
+      .add(StructField("ivrs_date_screen_failed", TimestampType, true))
+      .add(StructField("ivrs_date_randomized", TimestampType, true))
+      .add(StructField("ivrs_date_completed", TimestampType, true))
+      .add(StructField("ivrs_date_re_screened", TimestampType, true))
+      .add(StructField("ivrs_date_pre_screened", TimestampType, true))
+      .add(StructField("ivrs_date_randomization_failed", TimestampType, true))
+      .add(StructField("ivrs_date_pre_screened_failed", TimestampType, true))
+      .add(StructField("ivrs_date_enrollment", TimestampType, true))
+      .add(StructField("ivrs_date_dropout", TimestampType, true))
+      .add(StructField("acurian_released_date", TimestampType, true))
+      .add(StructField("acurian_enroll_date", TimestampType, true))
+      .add(StructField("acurian_fov_date", TimestampType, true))
+      .add(StructField("acurian_resolve_date", TimestampType, true))
+      .add(StructField("acurian_consent_date", TimestampType, true))
+      .add(StructField("acurian_rand_date", TimestampType, true))
+      .add(StructField("acurian_site_id", StringType, true))
+      .add(StructField("ivrs_site_id", StringType, true))
+      .add(StructField("mapped_site_no", StringType, true))
+      .add(StructField("system_rank", IntegerType, true))
+      .add(StructField("rule", StringType, true))
+      .add(StructField("ivrs_file_name", StringType, true))
   }
 
   def getConnectionString(userName: String, password: String, host: String, port: String, dbName: String): String = {
