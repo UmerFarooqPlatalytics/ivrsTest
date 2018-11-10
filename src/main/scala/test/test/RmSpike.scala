@@ -869,7 +869,7 @@ object RmSpike {
 
       
       Row.fromSeq(Seq(record.getAs[String](Constants.ACURIAN_SCREENING_ID), // Acurian Project ID
-        record.getAs[String](Constants.ACURIAN_PROJECT_ID), // Acurian Project ID
+        record.getAs[Int](Constants.ACURIAN_PROJECT_ID).toString, // Acurian Project ID
         record.getAs[String](Constants.IVRS_PROJECT_ID), // IVRS Project ID
         record.getAs[String](Constants.ACURIAN_REFERRED_PROTOCOL), // Acurian Referred Protocol Number
         record.getAs[String](Constants.ACURIAN_CONSENTED_PROTOCOL), // Acurian Consented Protocol Number
