@@ -400,7 +400,7 @@ object RmSpike {
           "ivrs_project_id" -> row.getAs[String]("ivrs_project_id"),
           "ivrs_patient_id" -> row.getAs[String]("ivrs_patient_id"),
           "ivrs_country" -> row.getAs[String]("ivrs_country"),
-          "acurian_patient_id" -> row.getAs[java.math.BigDecimal]("acurian_patient_id").toString.split('.')(0))
+          "acurian_patient_id" -> row.getAs[String]("acurian_patient_id").toString.split('.')(0))
 
         val inProcessRecords = MongoDBObject("ivrs_protocol_number" -> row.getAs[String]("ivrs_protocol_number"),
           "ivrs_project_id" -> row.getAs[String]("ivrs_project_id"),
