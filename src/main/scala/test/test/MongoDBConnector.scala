@@ -43,6 +43,18 @@ class MongoDBConnector {
     coll.update(query, newObj, true)
   }
 
+  def getRecordsByKeys(dbName: String, collectionName: String, acurianPtId: String, acurianProtocol: String,
+                       acurianProject: String, acurianCountry: String): String = {
+    val db: com.mongodb.casbah.MongoDB = mongoClient(dbName)
+    val coll = db(collectionName)
+    val mongoDbObj = MongoDBObject("ACURIAN_PATIENT_ID" -> acurianPtId,
+      "ACURIAN_PROTOCOL_NUM" -> acurianProtocol,
+      "ACURIAN_PROJECT_ID" -> acurianProject,
+      "IVRS_COUNTRY" -> acurianCountry)
+    val result = coll.findOne(mongoDbObj)
+    result.getOrElse("").toString
+  }
+
   def getRecordsById(dbName: String, collectionName: String, objId: String): String = {
     val db: com.mongodb.casbah.MongoDB = mongoClient(dbName)
     val coll = db(collectionName)

@@ -110,12 +110,66 @@ object RmSpike {
 
     val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
     val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
-    matches.show
-    matches.createOrReplaceTempView("rankedData")
+    //matches.show
+    //matches.createOrReplaceTempView("rankedData")
 
-    //    matches.rdd.map(matched => {
-    //
-    //    })
+    sparkSession.sqlContext.applySchema(matches.rdd.mapPartitions(partition => {
+
+      val mongoCon = new MongoDBConnector
+      mongoCon.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
+
+      partition.map(matched => {
+
+        val matchCheck = mongoCon.getRecordsByKeys(Constants.PROCESS_MONGO_DB_NAME, Constants.ACURIAN_STAGING,
+          matched.getAs[String]("acurian_patient_id"),
+          matched.getAs[String]("acurian_consented_protocol"),
+          matched.getAs[String]("acurian_project_id"),
+          matched.getAs[String]("ivrs_country"))
+
+        val record = Json.parse(matchCheck)
+        val matchRank = matched.getAs[Int]("system_rank")
+        if (matchCheck != "" &&
+          (record \ "ACURIAN_PROJECT_ID").as[String] != (record \ "IVRS_PROJECT_ID").as[String] &&
+          (record \ "SYSTEM_RANK").as[String].toInt > matchRank) {
+
+          var param = scala.collection.immutable.Map.empty[String, Any]
+          param += ("IVRS_PATIENT_ID" -> (record \ "IVRS_PATIENT_ID").as[String])
+          param += ("IVRS_DOB_DAY" -> (record \ "IVRS_DOB_DAY").as[String])
+          param += ("IVRS_DOB_MONTH" -> (record \ "IVRS_DOB_MONTH").as[String])
+          param += ("IVRS_DOB_YEAR" -> (record \ "IVRS_DOB_YEAR").as[String])
+          param += ("IVRS_PATIENT_F_INITIAL" -> (record \ "IVRS_PATIENT_F_INITIAL").as[String])
+          param += ("IVRS_PATIENT_M_INITIAL" -> (record \ "IVRS_PATIENT_M_INITIAL").as[String])
+          param += ("IVRS_PATIENT_L_INITIAL" -> (record \ "IVRS_PATIENT_L_INITIAL").as[String])
+          param += ("IVRS_INVESTIGATOR_F_INITIAL" -> (record \ "IVRS_INVESTIGATOR_F_INITIAL").as[String])
+          param += ("IVRS_INVESTIGATOR_M_INITIAL" -> (record \ "IVRS_INVESTIGATOR_M_INITIAL").as[String])
+          param += ("IVRS_INVESTIGATOR_L_INITIAL" -> (record \ "IVRS_INVESTIGATOR_L_INITIAL").as[String])
+          param += ("IVRS_GENDER" -> (record \ "IVRS_GENDER").as[String])
+          param += ("IVRS_DATE_SCREENED" -> (record \ "IVRS_DATE_SCREENED").as[String])
+          param += ("IVRS_DATE_SCREEN_FAILED" -> (record \ "IVRS_DATE_SCREEN_FAILED").as[String])
+          param += ("IVRS_DATE_RANDOMIZED" -> (record \ "IVRS_DATE_RANDOMIZED").as[String])
+          param += ("IVRS_DATE_COMPLETED" -> (record \ "IVRS_DATE_COMPLETED").as[String])
+          param += ("IVRS_DATE_RE_SCREENED" -> (record \ "IVRS_DATE_RE_SCREENED").as[String])
+          param += ("IVRS_DATE_PRE_SCREENED" -> (record \ "IVRS_DATE_PRE_SCREENED").as[String])
+          param += ("IVRS_DATE_RANDOMIZATION_FAILED" -> (record \ "IVRS_DATE_RANDOMIZATION_FAILED").as[String])
+          param += ("IVRS_DATE_PRE_SCREEN_FAILED" -> (record \ "IVRS_DATE_PRE_SCREEN_FAILED").as[String])
+          param += ("IVRS_DATE_ENROLLMENT" -> (record \ "IVRS_DATE_ENROLLMENT").as[String])
+          param += ("IVRS_DATE_DROPOUT" -> (record \ "IVRS_DATE_DROPOUT").as[String])
+          param += ("IVRS_REGION" -> (record \ "IVRS_REGION").as[String])
+          param += ("IVRS_COUNTRY" -> (record \ "IVRS_COUNTRY").as[String])
+          param += ("IVRS_PROTOCOL_NUMBER" -> (record \ "IVRS_PROTOCOL_NUMBER").as[String])
+          param += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
+          param += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
+
+          mongoCon.updateAcurianStagingRecord("test", "acurianstagings", param, (record \ "IVRS_PATIENT_ID").as[String],
+            (record \ "IVRS_PROTOCOL_NUMBER").as[String],
+            (record \ "IVRS_PROJECT_ID").as[String],
+            (record \ "IVRS_COUNTRY").as[String])
+          matched
+        } else {
+          Row.fromSeq(Seq.empty)
+        }
+      })
+    }).filter(_.size > 0), stagingSchema).createOrReplaceTempView("rankedData")
 
     val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
@@ -675,19 +729,19 @@ object RmSpike {
       val acurianInvstMName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_M_NAME).replaceAll("\\s", "")) getOrElse null
       val acurianInvstLName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_L_NAME).replaceAll("\\s", "")) getOrElse null
 
-//      println(s"acurianDobD: ${acurianDobD}")
-//      println(s"acurianDobM: ${acurianDobM}")
-//      println(s"acurianDobY: ${acurianDobY}")
-//      println(s"acurianPtFI: ${acurianPtFI}")
-//      println(s"acurianPtMI: ${acurianPtMI}")
-//      println(s"acurianPtLI: ${acurianPtLI}")
-//      println(s"acurianGender: ${acurianGender}")
-//      println(s"acurianSiteID: ${acurianSiteID}")
-//      println(s"acurianInvstFName: ${acurianInvstFName}")
-//      println(s"acurianInvstMName: ${acurianInvstMName}")
-//      println(s"acurianInvstLName: ${acurianInvstLName}")
-//      println(s"acurianPatientID: ${record.getAs[String](Constants.ACURIAN_PATIENT_ID)}")
-//      println("===================================================")
+      //      println(s"acurianDobD: ${acurianDobD}")
+      //      println(s"acurianDobM: ${acurianDobM}")
+      //      println(s"acurianDobY: ${acurianDobY}")
+      //      println(s"acurianPtFI: ${acurianPtFI}")
+      //      println(s"acurianPtMI: ${acurianPtMI}")
+      //      println(s"acurianPtLI: ${acurianPtLI}")
+      //      println(s"acurianGender: ${acurianGender}")
+      //      println(s"acurianSiteID: ${acurianSiteID}")
+      //      println(s"acurianInvstFName: ${acurianInvstFName}")
+      //      println(s"acurianInvstMName: ${acurianInvstMName}")
+      //      println(s"acurianInvstLName: ${acurianInvstLName}")
+      //      println(s"acurianPatientID: ${record.getAs[String](Constants.ACURIAN_PATIENT_ID)}")
+      //      println("===================================================")
 
       /**
        * DOB Match
@@ -865,7 +919,6 @@ object RmSpike {
         recordRank = 0
       }
 
-      
       Row.fromSeq(Seq(record.getAs[String](Constants.ACURIAN_SCREENING_ID), // Acurian Project ID
         record.getAs[Int](Constants.ACURIAN_PROJECT_ID).toString, // Acurian Project ID
         record.getAs[String](Constants.IVRS_PROJECT_ID), // IVRS Project ID
@@ -1528,14 +1581,32 @@ object RmSpike {
 
   def stagingSchema(): StructType = {
     new StructType()
-      .add(StructField("IVRS_PROJECT_ID", StringType, true))
-      .add(StructField("IVRS_PROTOCOL_NUMBER", StringType, true))
       .add(StructField("IVRS_PATIENT_ID", StringType, true))
+      .add(StructField("IVRS_DOB_DAY", StringType, true))
+      .add(StructField("IVRS_DOB_MONTH", StringType, true))
+      .add(StructField("IVRS_DOB_YEAR", StringType, true))
+      .add(StructField("IVRS_PATIENT_F_INITIAL", StringType, true))
+      .add(StructField("IVRS_PATIENT_M_INITIAL", StringType, true))
+      .add(StructField("IVRS_PATIENT_L_INITIAL", StringType, true))
+      .add(StructField("IVRS_INVESTIGATOR_F_INITIAL", StringType, true))
+      .add(StructField("IVRS_INVESTIGATOR_M_INITIAL", StringType, true))
+      .add(StructField("IVRS_INVESTIGATOR_L_INITIAL", StringType, true))
+      .add(StructField("IVRS_GENDER", StringType, true))
+      .add(StructField("IVRS_DATE_SCREENED", StringType, true))
+      .add(StructField("IVRS_DATE_SCREEN_FAILED", StringType, true))
+      .add(StructField("IVRS_DATE_RANDOMIZED", StringType, true))
+      .add(StructField("IVRS_DATE_COMPLETED", StringType, true))
+      .add(StructField("IVRS_DATE_RE_SCREENED", StringType, true))
+      .add(StructField("IVRS_DATE_PRE_SCREENED", StringType, true))
+      .add(StructField("IVRS_DATE_RANDOMIZATION_FAILED", StringType, true))
+      .add(StructField("IVRS_DATE_PRE_SCREEN_FAILED", StringType, true))
+      .add(StructField("IVRS_DATE_ENROLLMENT", StringType, true))
+      .add(StructField("IVRS_DATE_DROPOUT", StringType, true))
+      .add(StructField("IVRS_REGION", StringType, true))
       .add(StructField("IVRS_COUNTRY", StringType, true))
-      .add(StructField("ACURIAN_PROJECT_ID", StringType, true))
-      .add(StructField("ACURIAN_PATIENT_ID", IntegerType, true))
-      .add(StructField("SYSTEM_RANK", IntegerType, false))
-      .add(StructField("CONFIRMATION_METHOD", IntegerType, true))
+      .add(StructField("IVRS_PROTOCOL_NUMBER", StringType, true))
+      .add(StructField("IVRS_SITE_ID", StringType, true))
+      .add(StructField("IVRS_PROJECT_ID", StringType, true))
   }
 
   def rulesAppliedSchema(): StructType = {
