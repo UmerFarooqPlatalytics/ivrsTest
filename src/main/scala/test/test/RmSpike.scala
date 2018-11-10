@@ -688,6 +688,7 @@ object RmSpike {
       println(s"acurianInvstFName: ${acurianInvstFName}")
       println(s"acurianInvstMName: ${acurianInvstMName}")
       println(s"acurianInvstLName: ${acurianInvstLName}")
+      println(s"acurianPatientID: ${record.getAs[String](Constants.ACURIAN_PROJECT_ID)}")
       println("===================================================")
 
       /**
