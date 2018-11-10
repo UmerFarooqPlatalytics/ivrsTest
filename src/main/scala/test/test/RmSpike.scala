@@ -898,7 +898,7 @@ object RmSpike {
         ivrsInvstLName, //IVRS inv last name
         acurianInvstFName, //Acurian inv first name
         acurianInvstMName, //Acurian inv middle name
-        acurianInvstLName, //Acurian inv last name
+        acurianInvstLName/*, //Acurian inv last name
         record.getAs[Timestamp](Constants.IVRS_DATE_SCREENED),
         record.getAs[Timestamp](Constants.IVRS_DATE_SCREEN_FAILED),
         record.getAs[Timestamp](Constants.IVRS_DATE_RANDOMIZED),
@@ -920,7 +920,7 @@ object RmSpike {
         "", //ivrs mapped site no
         recordRank,
         rule,
-        ivrsFileName))
+        ivrsFileName*/))
 
     })
 
@@ -1573,7 +1573,7 @@ object RmSpike {
       .add(StructField("acurian_invst_f_name", StringType, true))
       .add(StructField("acurian_invst_m_name", StringType, true))
       .add(StructField("acurian_invst_l_name", StringType, true))
-      .add(StructField("ivrs_date_screened", TimestampType, true))
+      /*.add(StructField("ivrs_date_screened", TimestampType, true))
       .add(StructField("ivrs_date_screen_failed", TimestampType, true))
       .add(StructField("ivrs_date_randomized", TimestampType, true))
       .add(StructField("ivrs_date_completed", TimestampType, true))
@@ -1594,7 +1594,7 @@ object RmSpike {
       .add(StructField("mapped_site_no", StringType, true))
       .add(StructField("system_rank", IntegerType, true))
       .add(StructField("rule", StringType, true))
-      .add(StructField("ivrs_file_name", StringType, true))
+      .add(StructField("ivrs_file_name", StringType, true))*/
   }
 
   def getConnectionString(userName: String, password: String, host: String, port: String, dbName: String): String = {
