@@ -169,9 +169,9 @@ object RmSpike {
           Row.fromSeq(Seq.empty)
         }
       })
-    }).filter(_.size > 0), stagingSchema).createOrReplaceTempView("rankedData")
+    }).filter(_.size > 0), rulesAppliedSchema()).createOrReplaceTempView("rankedData")
 
-    val exactMatches = sql.sql(s"""
+      val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
                 acurian_project_id as ACURIAN_PROJECT_ID, 
                 ivrs_project_id as IVRS_PROJECT_ID, 
