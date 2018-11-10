@@ -169,7 +169,7 @@ object RmSpike {
           Row.fromSeq(Seq.empty)
         }
       })
-    }).filter(_.size > 0), rulesAppliedSchema()).createOrReplaceTempView("rankedData")
+    }).filter(_.size > 0), rulesAppliedSchema).persist().createOrReplaceTempView("rankedData")
 
       val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
