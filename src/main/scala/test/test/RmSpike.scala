@@ -115,8 +115,8 @@ object RmSpike {
 
     sparkSession.sqlContext.applySchema(matches.rdd.mapPartitions(partition => {
 
-      val mongoCon = new MongoDBConnector
-      mongoCon.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
+      val mongoConnn = new MongoDBConnector
+      mongoConnn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
 
       partition.map(matched => {
 
@@ -160,7 +160,7 @@ object RmSpike {
           param += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
           param += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
 
-          mongoCon.updateAcurianStagingRecord("test", "acurianstagings", param, (record \ "IVRS_PATIENT_ID").as[String],
+          mongoConnn.updateAcurianStagingRecord("test", "acurianstagings", param, (record \ "IVRS_PATIENT_ID").as[String],
             (record \ "IVRS_PROTOCOL_NUMBER").as[String],
             (record \ "IVRS_PROJECT_ID").as[String],
             (record \ "IVRS_COUNTRY").as[String])
