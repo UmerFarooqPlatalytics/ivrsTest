@@ -253,12 +253,16 @@ object RmSpike {
       """).createOrReplaceTempView("toRemoveCrossStudy")
 
     val ranksApplied = sql.sql("""
-        Select * from toRemoveCrossStudy group by ivrs_patient_Id having count(*) = 1
-        Union
-        with cte as(
-        Select * from toRemoveCrossStudy group by ivrs_patient_Id having count(*) > 1), cte2
-        (select * from cte where 
-        ivrs_project_id = acurian_project_id)
+        SELECT * 
+        FROM toRemoveCrossStudy 
+        WHERE
+        ivrs_patient_id IN (SELECT ivrs_patient_id 
+                             FROM toRemoveCrossStudy 
+                             GROUP BY ivrs_patient_id
+                             HAVING SUM(CASE WHEN ivrs_project_id = acurian_project_id
+                                             THEN 1 ELSE 0 END) = 0)
+        OR 
+        ivrs_project_id = acurian_project_id
         """)
 
     //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
