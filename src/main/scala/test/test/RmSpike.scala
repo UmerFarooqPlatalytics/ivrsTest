@@ -51,78 +51,78 @@ object RmSpike {
   val hdfsPath = "hdfs://ds-dev-node-01:9000"
 
   def main(args: Array[String]) {
-    run("3889-M14_431-US-20181105.csv", 1)
+    run("4385-MVT_601_3101-US-20181110.xlsx", 2)
   }
 
   def run(ivrsFileName: String, headerLines: Int): DataFrame = {
 
-    val acurianData = sql.read
+    val acurianData = sparkSession.sqlContext.read
       .format("com.databricks.spark.csv")
       .option("inferSchema", "true")
       .option("header", "true")
       .option("delimiter", ",")
       .load(s"${hdfsPath}/RmData")
 
-    acurianData.printSchema
+    println("+++++++++ acurian schema ++++++++++")
+    acurianData.printSchema()
 
-    //    var filePath = Constants.IVRS_FILES_PATH + s"/${ivrsFileName}"
-    //
-    //    val ivrsData = loadIvrsData(ivrsFileName, headerLines - 1)
-    //
-    //    val projectID = ivrsFileName.split("-")(0)
-    //    val project = mongoCon.getRecordsByKey("test", "projects", "project_id", projectID)
-    //    val rankThreshold = (Json.parse(project) \ "rank_threshold").as[Int]
-    //
-    //    val schemaAppliedData = mapSchema(ivrsFileName, ivrsData) //.cache
-    //
-    //    //dumpForDashboard(acurianData, "acurianData")
-    //    schemaAppliedData.createOrReplaceTempView("schemaAppliedData")
-    //
-    //    val tempDataForStagingTable = sql.sql("""
-    //      SELECT  ivrs_patient_id as IVRS_PATIENT_ID,
-    //	            dob_day as IVRS_DOB_DAY,
-    //	            dob_month as IVRS_DOB_MONTH,
-    //	            dob_year as IVRS_DOB_YEAR,
-    //	            patient_f_initial as IVRS_PATIENT_F_INITIAL,
-    //	            patient_m_initial as IVRS_PATIENT_M_INITIAL,
-    //	            patient_l_initial as IVRS_PATIENT_L_INITIAL,
-    //	            investigator_f_name as IVRS_INVESTIGATOR_F_INITIAL,
-    //	            investigator_m_name as IVRS_INVESTIGATOR_M_INITIAL,
-    //	            investigator_l_name as IVRS_INVESTIGATOR_L_INITIAL,
-    //	            gender as IVRS_GENDER,
-    //	            date_screened as IVRS_DATE_SCREENED,
-    //	            date_screen_failed as IVRS_DATE_SCREEN_FAILED,
-    //	            date_randomized as IVRS_DATE_RANDOMIZED,
-    //	            date_completed as IVRS_DATE_COMPLETED,
-    //	            date_re_screened as IVRS_DATE_RE_SCREENED,
-    //	            date_pre_screened as IVRS_DATE_PRE_SCREENED,
-    //	            date_randomization_failed as IVRS_DATE_RANDOMIZATION_FAILED,
-    //	            date_pre_screen_failed as IVRS_DATE_PRE_SCREEN_FAILED,
-    //	            date_enrollment as IVRS_DATE_ENROLLMENT,
-    //	            date_dropout as IVRS_DATE_DROPOUT,
-    //	            region as IVRS_REGION,
-    //	            country as IVRS_COUNTRY,
-    //	            protocol_number as IVRS_PROTOCOL_NUMBER,
-    //	            site_id as IVRS_SITE_ID,
-    //	            project_id as IVRS_PROJECT_ID
-    //	    FROM schemaAppliedData
-    //      """)
-    //
-    //    updateInStaging(tempDataForStagingTable)
-    //
-    //    val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
-    //    val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
-    //    //matches.show
-    //    //matches.createOrReplaceTempView("rankedData")
-    //
-    //    sparkSession.sqlContext.applySchema(matches.rdd.mapPartitions(partition => {
-    //
+    var filePath = Constants.IVRS_FILES_PATH + s"/${ivrsFileName}"
+
+    val ivrsData = loadIvrsData(ivrsFileName, headerLines - 1)
+
+    val projectID = ivrsFileName.split("-")(0)
+    val project = mongoCon.getRecordsByKey("test", "projects", "project_id", projectID)
+    val rankThreshold = (Json.parse(project) \ "rank_threshold").as[Int]
+
+    val schemaAppliedData = mapSchema(ivrsFileName, ivrsData) //.cache
+
+    //dumpForDashboard(acurianData, "acurianData")
+    schemaAppliedData.createOrReplaceTempView("schemaAppliedData")
+
+    val tempDataForStagingTable = sql.sql("""
+      SELECT  ivrs_patient_id as IVRS_PATIENT_ID,
+	            dob_day as IVRS_DOB_DAY,
+	            dob_month as IVRS_DOB_MONTH,
+	            dob_year as IVRS_DOB_YEAR,
+	            patient_f_initial as IVRS_PATIENT_F_INITIAL,
+	            patient_m_initial as IVRS_PATIENT_M_INITIAL,
+	            patient_l_initial as IVRS_PATIENT_L_INITIAL,
+	            investigator_f_name as IVRS_INVESTIGATOR_F_INITIAL,
+	            investigator_m_name as IVRS_INVESTIGATOR_M_INITIAL,
+	            investigator_l_name as IVRS_INVESTIGATOR_L_INITIAL,
+	            gender as IVRS_GENDER,
+	            date_screened as IVRS_DATE_SCREENED,
+	            date_screen_failed as IVRS_DATE_SCREEN_FAILED,
+	            date_randomized as IVRS_DATE_RANDOMIZED,
+	            date_completed as IVRS_DATE_COMPLETED,
+	            date_re_screened as IVRS_DATE_RE_SCREENED,
+	            date_pre_screened as IVRS_DATE_PRE_SCREENED,
+	            date_randomization_failed as IVRS_DATE_RANDOMIZATION_FAILED,
+	            date_pre_screen_failed as IVRS_DATE_PRE_SCREEN_FAILED,
+	            date_enrollment as IVRS_DATE_ENROLLMENT,
+	            date_dropout as IVRS_DATE_DROPOUT,
+	            region as IVRS_REGION,
+	            country as IVRS_COUNTRY,
+	            protocol_number as IVRS_PROTOCOL_NUMBER,
+	            site_id as IVRS_SITE_ID,
+	            project_id as IVRS_PROJECT_ID
+	    FROM schemaAppliedData
+      """)
+
+    updateInStaging(tempDataForStagingTable)
+
+    val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
+    val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
+    matches.createOrReplaceTempView("rankedData")
+    //dumpForDashboard(rawRanks, "allcomparisons")
+    dumpForDashboard(matches, "allcomparisons")
+    //    sql.applySchema(matches.rdd.mapPartitions(partition => {
     //      val mongoConnn = new MongoDBConnector
     //      mongoConnn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
     //
     //      partition.map(matched => {
     //
-    //        val matchCheck = mongoCon.getRecordsByKeys(Constants.PROCESS_MONGO_DB_NAME, Constants.ACURIAN_STAGING,
+    //        val matchCheck = mongoConnn.getRecordsByKeys(Constants.PROCESS_MONGO_DB_NAME, Constants.ACURIAN_STAGING,
     //          matched.getAs[String]("acurian_patient_id"),
     //          matched.getAs[String]("acurian_consented_protocol"),
     //          matched.getAs[String]("acurian_project_id"),
@@ -135,37 +135,38 @@ object RmSpike {
     //          val matchRank = matched.getAs[Int]("system_rank")
     //          if (matchCheck != "" &&
     //            (record \ "ACURIAN_PROJECT_ID").as[String] != (record \ "IVRS_PROJECT_ID").as[String] &&
-    //            (record \ "SYSTEM_RANK").as[String].toInt > matchRank) {
+    //            (record \ "SYSTEM_RANK").as[String].toInt > matchRank &&
+    //            (record \ "CONFIRMATION_METHOD_CD").as[String].equals("2")) {
     //
-    //            var param = scala.collection.immutable.Map.empty[String, Any]
-    //            param += ("IVRS_PATIENT_ID" -> (record \ "IVRS_PATIENT_ID").as[String])
-    //            param += ("IVRS_DOB_DAY" -> (record \ "IVRS_DOB_DAY").as[String])
-    //            param += ("IVRS_DOB_MONTH" -> (record \ "IVRS_DOB_MONTH").as[String])
-    //            param += ("IVRS_DOB_YEAR" -> (record \ "IVRS_DOB_YEAR").as[String])
-    //            param += ("IVRS_PATIENT_F_INITIAL" -> (record \ "IVRS_PATIENT_F_INITIAL").as[String])
-    //            param += ("IVRS_PATIENT_M_INITIAL" -> (record \ "IVRS_PATIENT_M_INITIAL").as[String])
-    //            param += ("IVRS_PATIENT_L_INITIAL" -> (record \ "IVRS_PATIENT_L_INITIAL").as[String])
-    //            param += ("IVRS_INVESTIGATOR_F_INITIAL" -> (record \ "IVRS_INVESTIGATOR_F_INITIAL").as[String])
-    //            param += ("IVRS_INVESTIGATOR_M_INITIAL" -> (record \ "IVRS_INVESTIGATOR_M_INITIAL").as[String])
-    //            param += ("IVRS_INVESTIGATOR_L_INITIAL" -> (record \ "IVRS_INVESTIGATOR_L_INITIAL").as[String])
-    //            param += ("IVRS_GENDER" -> (record \ "IVRS_GENDER").as[String])
-    //            param += ("IVRS_DATE_SCREENED" -> (record \ "IVRS_DATE_SCREENED").as[String])
-    //            param += ("IVRS_DATE_SCREEN_FAILED" -> (record \ "IVRS_DATE_SCREEN_FAILED").as[String])
-    //            param += ("IVRS_DATE_RANDOMIZED" -> (record \ "IVRS_DATE_RANDOMIZED").as[String])
-    //            param += ("IVRS_DATE_COMPLETED" -> (record \ "IVRS_DATE_COMPLETED").as[String])
-    //            param += ("IVRS_DATE_RE_SCREENED" -> (record \ "IVRS_DATE_RE_SCREENED").as[String])
-    //            param += ("IVRS_DATE_PRE_SCREENED" -> (record \ "IVRS_DATE_PRE_SCREENED").as[String])
-    //            param += ("IVRS_DATE_RANDOMIZATION_FAILED" -> (record \ "IVRS_DATE_RANDOMIZATION_FAILED").as[String])
-    //            param += ("IVRS_DATE_PRE_SCREEN_FAILED" -> (record \ "IVRS_DATE_PRE_SCREEN_FAILED").as[String])
-    //            param += ("IVRS_DATE_ENROLLMENT" -> (record \ "IVRS_DATE_ENROLLMENT").as[String])
-    //            param += ("IVRS_DATE_DROPOUT" -> (record \ "IVRS_DATE_DROPOUT").as[String])
-    //            param += ("IVRS_REGION" -> (record \ "IVRS_REGION").as[String])
-    //            param += ("IVRS_COUNTRY" -> (record \ "IVRS_COUNTRY").as[String])
-    //            param += ("IVRS_PROTOCOL_NUMBER" -> (record \ "IVRS_PROTOCOL_NUMBER").as[String])
-    //            param += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
-    //            param += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
+    //            var mongoRecord = scala.collection.immutable.Map.empty[String, Any]
+    //            mongoRecord += ("IVRS_PATIENT_ID" -> (record \ "IVRS_PATIENT_ID").as[String])
+    //            mongoRecord += ("IVRS_DOB_DAY" -> (record \ "IVRS_DOB_DAY").as[String])
+    //            mongoRecord += ("IVRS_DOB_MONTH" -> (record \ "IVRS_DOB_MONTH").as[String])
+    //            mongoRecord += ("IVRS_DOB_YEAR" -> (record \ "IVRS_DOB_YEAR").as[String])
+    //            mongoRecord += ("IVRS_PATIENT_F_INITIAL" -> (record \ "IVRS_PATIENT_F_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_PATIENT_M_INITIAL" -> (record \ "IVRS_PATIENT_M_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_PATIENT_L_INITIAL" -> (record \ "IVRS_PATIENT_L_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_INVESTIGATOR_F_INITIAL" -> (record \ "IVRS_INVESTIGATOR_F_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_INVESTIGATOR_M_INITIAL" -> (record \ "IVRS_INVESTIGATOR_M_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_INVESTIGATOR_L_INITIAL" -> (record \ "IVRS_INVESTIGATOR_L_INITIAL").as[String])
+    //            mongoRecord += ("IVRS_GENDER" -> (record \ "IVRS_GENDER").as[String])
+    //            mongoRecord += ("IVRS_DATE_SCREENED" -> (record \ "IVRS_DATE_SCREENED").as[String])
+    //            mongoRecord += ("IVRS_DATE_SCREEN_FAILED" -> (record \ "IVRS_DATE_SCREEN_FAILED").as[String])
+    //            mongoRecord += ("IVRS_DATE_RANDOMIZED" -> (record \ "IVRS_DATE_RANDOMIZED").as[String])
+    //            mongoRecord += ("IVRS_DATE_COMPLETED" -> (record \ "IVRS_DATE_COMPLETED").as[String])
+    //            mongoRecord += ("IVRS_DATE_RE_SCREENED" -> (record \ "IVRS_DATE_RE_SCREENED").as[String])
+    //            mongoRecord += ("IVRS_DATE_PRE_SCREENED" -> (record \ "IVRS_DATE_PRE_SCREENED").as[String])
+    //            mongoRecord += ("IVRS_DATE_RANDOMIZATION_FAILED" -> (record \ "IVRS_DATE_RANDOMIZATION_FAILED").as[String])
+    //            mongoRecord += ("IVRS_DATE_PRE_SCREEN_FAILED" -> (record \ "IVRS_DATE_PRE_SCREEN_FAILED").as[String])
+    //            mongoRecord += ("IVRS_DATE_ENROLLMENT" -> (record \ "IVRS_DATE_ENROLLMENT").as[String])
+    //            mongoRecord += ("IVRS_DATE_DROPOUT" -> (record \ "IVRS_DATE_DROPOUT").as[String])
+    //            mongoRecord += ("IVRS_REGION" -> (record \ "IVRS_REGION").as[String])
+    //            mongoRecord += ("IVRS_COUNTRY" -> (record \ "IVRS_COUNTRY").as[String])
+    //            mongoRecord += ("IVRS_PROTOCOL_NUMBER" -> (record \ "IVRS_PROTOCOL_NUMBER").as[String])
+    //            mongoRecord += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
+    //            mongoRecord += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
     //
-    //            mongoConnn.updateAcurianStagingRecord("test", "acurianstagings", param, (record \ "IVRS_PATIENT_ID").as[String],
+    //            mongoConnn.updateAcurianStagingRecord("test", "acurianstagings", mongoRecord, (record \ "IVRS_PATIENT_ID").as[String],
     //              (record \ "IVRS_PROTOCOL_NUMBER").as[String],
     //              (record \ "IVRS_PROJECT_ID").as[String],
     //              (record \ "IVRS_COUNTRY").as[String])
@@ -175,159 +176,158 @@ object RmSpike {
     //          }
     //        }
     //      })
-    //    }).filter(_.size > 0), rulesAppliedSchema).persist().createOrReplaceTempView("rankedData")
-    //
-    //    val exactMatches = sql.sql(s"""
-    //         SELECT acurian_screening_id as ACURIAN_SSID,
-    //                acurian_project_id as ACURIAN_PROJECT_ID, 
-    //                ivrs_project_id as IVRS_PROJECT_ID, 
-    //                acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
-    //                ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
-    //                ivrs_country as IVRS_COUNTRY,
-    //                acurian_patient_id as ACURIAN_PATIENT_ID, 
-    //                ivrs_patient_id as IVRS_PATIENT_ID,
-    //                ivrs_dob_d as IVRS_DOB_DAY, 
-    //                ivrs_dob_m as IVRS_DOB_MONTH,
-    //                ivrs_dob_y as IVRS_DOB_YEAR, 
-    //                ivrs_gender as IVRS_GENDER, 
-    //                ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
-    //                ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
-    //                ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
-    //                ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
-    //                ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
-    //                ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
-    //                ivrs_date_screened as IVRS_DATE_SCREENED,
-    //                ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
-    //                ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
-    //                ivrs_date_completed as IVRS_DATE_COMPLETED, 
-    //                ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
-    //                ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
-    //                ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
-    //                ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
-    //                ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
-    //                ivrs_date_dropout as IVRS_DATE_DROPOUT, 
-    //                acurian_enroll_date as ACURIAN_ENROLLED_DT,
-    //                acurian_resolve_date as ACURIAN_RESOLVED_DT,
-    //                acurian_consent_date as ACURIAN_CONSENTED_DT, 
-    //                acurian_rand_date as ACURIAN_RANDOMIZED_DT,
-    //                acurian_site_id as ACURIAN_SITE_ID, 
-    //                ivrs_site_id as IVRS_SITE_ID, 
-    //                ivrs_region as IVRS_REGION,
-    //                system_rank as SYSTEM_RANK,
-    //                ivrs_file_name as IVRS_FILE_NAME,
-    //                '1' as CONFIRMATION_METHOD_CD
-    //         FROM   rankedData
-    //         WHERE  system_rank = 0
-    //         """)
-    //
-    //    //    matches.take(100).foreach(println)     
-    //    updateInStaging(exactMatches)
-    //
-    //    val stagingTable = null
-    //
-    //    sql.sql("""
-    //      SELECT rankedData.* 
-    //      FROM rankedData
-    //      JOIN(SELECT ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country, MIN(system_rank) as mrank
-    //      FROM rankedData
-    //      GROUP BY ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country
-    //      ) AS minrank ON rankedData.ivrs_project_id = minrank.ivrs_project_id AND 
-    //      rankedData.ivrs_patient_id = minrank.ivrs_patient_id AND
-    //      rankedData.ivrs_protocol_number = minrank.ivrs_protocol_number AND
-    //      rankedData.ivrs_country = minrank.ivrs_country AND
-    //      rankedData.system_rank = minrank.mrank
-    //      """).createOrReplaceTempView("forUniqueAcr")
-    //
-    //    sql.sql("""
-    //      SELECT forUniqueAcr.* 
-    //      FROM forUniqueAcr
-    //      JOIN(SELECT acurian_patient_id, MIN(system_rank) as mrank
-    //      FROM forUniqueAcr
-    //      GROUP BY acurian_patient_id
-    //      ) AS minrank ON forUniqueAcr.acurian_patient_id = minrank.acurian_patient_id AND
-    //      forUniqueAcr.system_rank = minrank.mrank
-    //      """).createOrReplaceTempView("toRemoveCrossStudy")
-    //
-    //    val ranksApplied = sql.sql("""
-    //        SELECT * 
-    //        FROM toRemoveCrossStudy 
-    //        WHERE
-    //        ivrs_project_id IN (SELECT ivrs_project_id 
-    //                             FROM toRemoveCrossStudy 
-    //                             GROUP BY ivrs_project_id 
-    //                             having count(ivrs_project_id) = 1)
-    //        OR
-    //        ivrs_project_id IN (SELECT ivrs_project_id 
-    //                             FROM toRemoveCrossStudy 
-    //                             GROUP BY ivrs_project_id
-    //                             HAVING SUM(CASE WHEN acurian_project_id = acurian_project_id
-    //                                             THEN 1 ELSE 0 END) = 0)
-    //        OR ivrs_project_id = acurian_project_id
-    //        """)
-    //
-    //    //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
-    //
-    //    val rejectedRecordsRemoved = removeRejectedRecords(ranksApplied.filter(ranksApplied("system_rank") !== 0))
-    //
-    //    val rankedStats = calculateStats(rejectedRecordsRemoved)
-    //
-    //    val dashBoardFiltered = dashBoardFilter(rankedStats, rankThreshold)
-    //
-    //    dumpForDashboard(dashBoardFiltered._2, "dashboardfilerecords")
-    //    dashBoardFiltered._1.createOrReplaceTempView("output")
-    //
-    //    val autoMatch = sql.sql(s"""
-    //     
-    //     SELECT acurian_screening_id as ACURIAN_SSID,
-    //            acurian_project_id as ACURIAN_PROJECT_ID, 
-    //            ivrs_project_id as IVRS_PROJECT_ID, 
-    //            acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
-    //            ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
-    //            ivrs_country as IVRS_COUNTRY,
-    //            acurian_patient_id as ACURIAN_PATIENT_ID, 
-    //            ivrs_patient_id as IVRS_PATIENT_ID,
-    //            ivrs_dob_d as IVRS_DOB_DAY, 
-    //            ivrs_dob_m as IVRS_DOB_MONTH,
-    //            ivrs_dob_y as IVRS_DOB_YEAR, 
-    //            ivrs_gender as IVRS_GENDER, 
-    //            ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
-    //            ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
-    //            ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
-    //            ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
-    //            ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
-    //            ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
-    //            ivrs_date_screened as IVRS_DATE_SCREENED,
-    //            ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
-    //            ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
-    //            ivrs_date_completed as IVRS_DATE_COMPLETED, 
-    //            ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
-    //            ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
-    //            ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
-    //            ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
-    //            ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
-    //            ivrs_date_dropout as IVRS_DATE_DROPOUT, 
-    //            acurian_enroll_date as ACURIAN_ENROLLED_DT,
-    //            acurian_resolve_date as ACURIAN_RESOLVED_DT,
-    //            acurian_consent_date as ACURIAN_CONSENTED_DT, 
-    //            acurian_rand_date as ACURIAN_RANDOMIZED_DT,
-    //            acurian_site_id as ACURIAN_SITE_ID, 
-    //            ivrs_site_id as IVRS_SITE_ID, 
-    //            ivrs_region as IVRS_REGION,
-    //            system_rank as SYSTEM_RANK,
-    //            ivrs_file_name as IVRS_FILE_NAME,
-    //            '2' as CONFIRMATION_METHOD_CD
-    //     FROM   output
-    //     """)
-    //
-    //    updateInStaging(autoMatch)
-    //
-    //    val fileToDelete = hdfsPath + "/acurianData/" + ivrsFileName.split('.')(0) + ".csv"
-    //    val fs = FileSystem.get(HDFSFactory.conf)
-    //    if (fs.exists(new Path(fileToDelete)))
-    //      fs.delete(new Path(fileToDelete), true)
-    //
-    //    dashBoardFiltered._2
-    null
+    //    }).filter(_.size > 0), rulesAppliedSchema)
+    //      .persist()
+    //      .createOrReplaceTempView("rankedData")
+
+    val exactMatches = sql.sql(s"""
+         SELECT acurian_screening_id as ACURIAN_SSID,
+                acurian_project_id as ACURIAN_PROJECT_ID, 
+                ivrs_project_id as IVRS_PROJECT_ID, 
+                acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
+                ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
+                ivrs_country as IVRS_COUNTRY,
+                acurian_patient_id as ACURIAN_PATIENT_ID, 
+                ivrs_patient_id as IVRS_PATIENT_ID,
+                ivrs_dob_d as IVRS_DOB_DAY, 
+                ivrs_dob_m as IVRS_DOB_MONTH,
+                ivrs_dob_y as IVRS_DOB_YEAR, 
+                ivrs_gender as IVRS_GENDER, 
+                ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
+                ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
+                ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
+                ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
+                ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
+                ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
+                ivrs_date_screened as IVRS_DATE_SCREENED,
+                ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
+                ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
+                ivrs_date_completed as IVRS_DATE_COMPLETED, 
+                ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
+                ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
+                ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
+                ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
+                ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
+                ivrs_date_dropout as IVRS_DATE_DROPOUT, 
+                acurian_enroll_date as ACURIAN_ENROLLED_DT,
+                acurian_resolve_date as ACURIAN_RESOLVED_DT,
+                acurian_consent_date as ACURIAN_CONSENTED_DT, 
+                acurian_rand_date as ACURIAN_RANDOMIZED_DT,
+                acurian_site_id as ACURIAN_SITE_ID, 
+                ivrs_site_id as IVRS_SITE_ID, 
+                ivrs_region as IVRS_REGION,
+                system_rank as SYSTEM_RANK,
+                ivrs_file_name as IVRS_FILE_NAME,
+                '1' as CONFIRMATION_METHOD_CD
+         FROM   rankedData
+         WHERE  system_rank = 0
+         """)
+
+    //    matches.take(100).foreach(println)     
+    updateInStaging(exactMatches)
+
+    val stagingTable = null
+
+    sql.sql("""
+      SELECT rankedData.* 
+      FROM rankedData
+      JOIN(SELECT ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country, 
+      MIN(system_rank) as mrank
+      FROM rankedData
+      GROUP BY ivrs_project_id, ivrs_patient_id , ivrs_protocol_number , ivrs_country
+      ) AS minrank ON rankedData.ivrs_project_id = minrank.ivrs_project_id AND 
+      rankedData.ivrs_patient_id = minrank.ivrs_patient_id AND
+      rankedData.ivrs_protocol_number = minrank.ivrs_protocol_number AND
+      rankedData.ivrs_country = minrank.ivrs_country AND
+      rankedData.system_rank = minrank.mrank
+      """).createOrReplaceTempView("forUniqueAcr")
+
+    sql.sql("""
+      SELECT forUniqueAcr.* 
+      FROM forUniqueAcr
+      JOIN(SELECT acurian_patient_id, MIN(system_rank) as mrank
+      FROM forUniqueAcr
+      GROUP BY acurian_patient_id
+      ) AS minrank ON forUniqueAcr.acurian_patient_id = minrank.acurian_patient_id AND
+      forUniqueAcr.system_rank = minrank.mrank
+      """).createOrReplaceTempView("toRemoveCrossStudy")
+
+    val ranksApplied = sql.sql("""
+        SELECT * 
+        FROM toRemoveCrossStudy 
+        WHERE
+        ivrs_patient_id IN (SELECT ivrs_patient_id 
+                             FROM toRemoveCrossStudy 
+                             GROUP BY ivrs_patient_id
+                             HAVING SUM(CASE WHEN ivrs_project_id = acurian_project_id
+                                             THEN 1 ELSE 0 END) = 0)
+        OR 
+        ivrs_project_id = acurian_project_id
+        """)
+
+    //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
+
+    val rejectedRecordsRemoved = removeRejectedRecords(ranksApplied.filter(ranksApplied("system_rank") !== 0))
+
+    val rankedStats = calculateStats(rejectedRecordsRemoved)
+
+    val dashBoardFiltered = dashBoardFilter(rankedStats, rankThreshold)
+
+    dumpForDashboard(dashBoardFiltered._2, "dashboardfilerecords")
+    dashBoardFiltered._1.createOrReplaceTempView("output")
+
+    val autoMatch = sql.sql(s"""
+     
+     SELECT acurian_screening_id as ACURIAN_SSID,
+            acurian_project_id as ACURIAN_PROJECT_ID, 
+            ivrs_project_id as IVRS_PROJECT_ID, 
+            acurian_consented_protocol as ACURIAN_PROTOCOL_NUM, 
+            ivrs_protocol_number as IVRS_PROTOCOL_NUMBER, 
+            ivrs_country as IVRS_COUNTRY,
+            acurian_patient_id as ACURIAN_PATIENT_ID, 
+            ivrs_patient_id as IVRS_PATIENT_ID,
+            ivrs_dob_d as IVRS_DOB_DAY, 
+            ivrs_dob_m as IVRS_DOB_MONTH,
+            ivrs_dob_y as IVRS_DOB_YEAR, 
+            ivrs_gender as IVRS_GENDER, 
+            ivrs_pt_fi as IVRS_PATIENT_F_INITIAL, 
+            ivrs_pt_mi as IVRS_PATIENT_M_INITIAL, 
+            ivrs_pt_li as IVRS_PATIENT_L_INITIAL, 
+            ivrs_invst_f_name as IVRS_INVESTIGATOR_F_INITIAL,
+            ivrs_invst_m_name as IVRS_INVESTIGATOR_M_INITIAL, 
+            ivrs_invst_l_name as IVRS_INVESTIGATOR_L_INITIAL,
+            ivrs_date_screened as IVRS_DATE_SCREENED,
+            ivrs_date_screen_failed as IVRS_DATE_SCREEN_FAILED, 
+            ivrs_date_randomized as IVRS_DATE_RANDOMIZED,
+            ivrs_date_completed as IVRS_DATE_COMPLETED, 
+            ivrs_date_re_screened as IVRS_DATE_RE_SCREENED,
+            ivrs_date_pre_screened as IVRS_DATE_PRE_SCREENED, 
+            ivrs_date_randomization_failed IVRS_DATE_RANDOMIZATION_FAILED,
+            ivrs_date_pre_screened_failed as IVRS_DATE_PRE_SCREEN_FAILED, 
+            ivrs_date_enrollment as IVRS_DATE_ENROLLMENT,
+            ivrs_date_dropout as IVRS_DATE_DROPOUT, 
+            acurian_enroll_date as ACURIAN_ENROLLED_DT,
+            acurian_resolve_date as ACURIAN_RESOLVED_DT,
+            acurian_consent_date as ACURIAN_CONSENTED_DT, 
+            acurian_rand_date as ACURIAN_RANDOMIZED_DT,
+            acurian_site_id as ACURIAN_SITE_ID, 
+            ivrs_site_id as IVRS_SITE_ID, 
+            ivrs_region as IVRS_REGION,
+            system_rank as SYSTEM_RANK,
+            ivrs_file_name as IVRS_FILE_NAME,
+            '2' as CONFIRMATION_METHOD_CD
+     FROM   output
+     """)
+
+    updateInStaging(autoMatch)
+
+    val fileToDelete = hdfsPath + "/acurianData/" + ivrsFileName.split('.')(0) + ".csv"
+    val fs = FileSystem.get(HDFSFactory.conf)
+    if (fs.exists(new Path(fileToDelete)))
+      fs.delete(new Path(fileToDelete), true)
+
+    dashBoardFiltered._2
+
   }
 
   def updateInStaging(data: DataFrame) = {
@@ -336,11 +336,11 @@ object RmSpike {
       val mongoConn = new MongoDBConnector
       mongoConn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
       val dataBase: com.mongodb.casbah.MongoDB = mongoConn.mongoClient("test")
-      val collection = dataBase("acurianstagings")
+      val collection = dataBase(Constants.ACURIAN_STAGING)
 
       partition.foreach(jsonRow => {
         val rowMap = jsonRow.getValuesMap[Any](jsonRow.schema.fieldNames)
-        mongoConn.updateAcurianStagingRecord("test", "acurianstagings", rowMap, jsonRow.getAs[String]("IVRS_PATIENT_ID"),
+        mongoConn.updateAcurianStagingRecord("test", Constants.ACURIAN_STAGING, rowMap, jsonRow.getAs[String]("IVRS_PATIENT_ID"),
           jsonRow.getAs[String]("IVRS_PROTOCOL_NUMBER"),
           jsonRow.getAs[String]("IVRS_PROJECT_ID"),
           jsonRow.getAs[String]("IVRS_COUNTRY"))
@@ -736,20 +736,6 @@ object RmSpike {
       val acurianInvstMName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_M_NAME).replaceAll("\\s", "")) getOrElse null
       val acurianInvstLName = Try(record.getAs[String](Constants.ACURIAN_INVESTIGATOR_L_NAME).replaceAll("\\s", "")) getOrElse null
 
-      //      println(s"acurianDobD: ${acurianDobD}")
-      //      println(s"acurianDobM: ${acurianDobM}")
-      //      println(s"acurianDobY: ${acurianDobY}")
-      //      println(s"acurianPtFI: ${acurianPtFI}")
-      //      println(s"acurianPtMI: ${acurianPtMI}")
-      //      println(s"acurianPtLI: ${acurianPtLI}")
-      //      println(s"acurianGender: ${acurianGender}")
-      //      println(s"acurianSiteID: ${acurianSiteID}")
-      //      println(s"acurianInvstFName: ${acurianInvstFName}")
-      //      println(s"acurianInvstMName: ${acurianInvstMName}")
-      //      println(s"acurianInvstLName: ${acurianInvstLName}")
-      //      println(s"acurianPatientID: ${record.getAs[String](Constants.ACURIAN_PATIENT_ID)}")
-      //      println("===================================================")
-
       /**
        * DOB Match
        */
@@ -891,7 +877,7 @@ object RmSpike {
        */
       val acurianScrnID = Try(record.getAs[String](Constants.ACURIAN_SCREENING_ID)) getOrElse "acurian_screening_id"
       val ivrsPtID = Try(record.getAs[String](Constants.IVRS_PATIENT_ID)) getOrElse "ivrs_patient_id"
-      val acurianProjectID = Try(record.getAs[String](Constants.ACURIAN_PROJECT_ID)) getOrElse "acurian_protocol_no"
+      val acurianProjectID = Try(record.getAs[Int](Constants.ACURIAN_PROJECT_ID).toString) getOrElse "acurian_protocol_no"
       val ivrsProjectID = Try(record.getAs[String](Constants.IVRS_PROJECT_ID)) getOrElse "ivrs_protocol_no"
 
       val idCheck = Try(acurianScrnID.equals(ivrsPtID)) getOrElse false
@@ -904,7 +890,8 @@ object RmSpike {
       /**
        * Released Date Match
        */
-      if (record.getAs[String](Constants.IVRS_DATE_SCREENED) != null) {
+      if (record.getAs[String](Constants.IVRS_DATE_SCREENED) != null
+        && record.getAs[Timestamp](Constants.ACURIAN_RELEASED_DATE) != null) {
         releaseDateMatch = record.getAs[Timestamp](Constants.IVRS_DATE_SCREENED).after(record.getAs[Timestamp](Constants.ACURIAN_RELEASED_DATE))
       }
 
@@ -934,7 +921,7 @@ object RmSpike {
         record.getAs[String](Constants.IVRS_PROTOCOL_NUMBER), //IVRS Protocol Number
         record.getAs[String](Constants.ACURIAN_COUNTRY), //Acurian Country
         record.getAs[String](Constants.IVRS_COUNTRY), //IVRS Country
-        record.getAs[Int](Constants.ACURIAN_PATIENT_ID).toString, // Acurian Patient ID
+        Try(record.getAs[String](Constants.ACURIAN_PATIENT_ID)) getOrElse "", // Acurian Patient ID
         record.getAs[String](Constants.IVRS_PATIENT_ID), //IVRS Screening ID
         record.getAs[String](Constants.IVRS_REGION), //IVRS Screening ID
         acurianDobD, //Acurian DOB day
@@ -1580,40 +1567,19 @@ object RmSpike {
     //    }
   }
 
+  //  def writeException(error: Exception, fileName: String) {
+  //    val mongoCon = new MongoDBConnector
+  //    mongoCon.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
+  //    mongoCon.updateRecordValue(Constants.PROCESS_MONGO_DB_NAME,
+  //      "ivrsprojectfiles", "file_name", fileName, "file_status", "Failed")
+  //    mongoCon.updateRecordValue(Constants.PROCESS_MONGO_DB_NAME,
+  //      "ivrsprojectfiles", "file_name", fileName, "error", error.getMessage)
+  //  }
+
   def merge(srcPath: String, dstPath: String): Unit = {
     val hdfs = FileSystem.get(HDFSFactory.conf)
     FileUtil.copyMerge(hdfs, new Path(srcPath), hdfs, new Path(dstPath), true,
       HDFSFactory.conf, null)
-  }
-
-  def stagingSchema(): StructType = {
-    new StructType()
-      .add(StructField("IVRS_PATIENT_ID", StringType, true))
-      .add(StructField("IVRS_DOB_DAY", StringType, true))
-      .add(StructField("IVRS_DOB_MONTH", StringType, true))
-      .add(StructField("IVRS_DOB_YEAR", StringType, true))
-      .add(StructField("IVRS_PATIENT_F_INITIAL", StringType, true))
-      .add(StructField("IVRS_PATIENT_M_INITIAL", StringType, true))
-      .add(StructField("IVRS_PATIENT_L_INITIAL", StringType, true))
-      .add(StructField("IVRS_INVESTIGATOR_F_INITIAL", StringType, true))
-      .add(StructField("IVRS_INVESTIGATOR_M_INITIAL", StringType, true))
-      .add(StructField("IVRS_INVESTIGATOR_L_INITIAL", StringType, true))
-      .add(StructField("IVRS_GENDER", StringType, true))
-      .add(StructField("IVRS_DATE_SCREENED", StringType, true))
-      .add(StructField("IVRS_DATE_SCREEN_FAILED", StringType, true))
-      .add(StructField("IVRS_DATE_RANDOMIZED", StringType, true))
-      .add(StructField("IVRS_DATE_COMPLETED", StringType, true))
-      .add(StructField("IVRS_DATE_RE_SCREENED", StringType, true))
-      .add(StructField("IVRS_DATE_PRE_SCREENED", StringType, true))
-      .add(StructField("IVRS_DATE_RANDOMIZATION_FAILED", StringType, true))
-      .add(StructField("IVRS_DATE_PRE_SCREEN_FAILED", StringType, true))
-      .add(StructField("IVRS_DATE_ENROLLMENT", StringType, true))
-      .add(StructField("IVRS_DATE_DROPOUT", StringType, true))
-      .add(StructField("IVRS_REGION", StringType, true))
-      .add(StructField("IVRS_COUNTRY", StringType, true))
-      .add(StructField("IVRS_PROTOCOL_NUMBER", StringType, true))
-      .add(StructField("IVRS_SITE_ID", StringType, true))
-      .add(StructField("IVRS_PROJECT_ID", StringType, true))
   }
 
   def rulesAppliedSchema(): StructType = {
