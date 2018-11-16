@@ -113,72 +113,72 @@ object RmSpike {
 
     val rawRanks = applyRanks(ivrsFileName, schemaAppliedData, acurianData) //.filter(ranksApplied("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER).createOrReplaceTempView("rankedData")
     val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
-    matches.createOrReplaceTempView("rankedData")
-    //dumpForDashboard(rawRanks, "allcomparisons")
-    //dumpForDashboard(matches, "allcomparisons")
-    //    sql.applySchema(matches.rdd.mapPartitions(partition => {
-    //      val mongoConnn = new MongoDBConnector
-    //      mongoConnn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
-    //
-    //      partition.map(matched => {
-    //
-    //        val matchCheck = mongoConnn.getRecordsByKeys(Constants.PROCESS_MONGO_DB_NAME, Constants.ACURIAN_STAGING,
-    //          matched.getAs[String]("acurian_patient_id"),
-    //          matched.getAs[String]("acurian_consented_protocol"),
-    //          matched.getAs[String]("acurian_project_id"),
-    //          matched.getAs[String]("ivrs_country"))
-    //
-    //        if (matchCheck == "") {
-    //          matched
-    //        } else {
-    //          val record = Json.parse(matchCheck)
-    //          val matchRank = matched.getAs[Int]("system_rank")
-    //          if (matchCheck != "" &&
-    //            (record \ "ACURIAN_PROJECT_ID").as[String] != (record \ "IVRS_PROJECT_ID").as[String] &&
-    //            (record \ "SYSTEM_RANK").as[String].toInt > matchRank &&
-    //            (record \ "CONFIRMATION_METHOD_CD").as[String].equals("2")) {
-    //
-    //            var mongoRecord = scala.collection.immutable.Map.empty[String, Any]
-    //            mongoRecord += ("IVRS_PATIENT_ID" -> (record \ "IVRS_PATIENT_ID").as[String])
-    //            mongoRecord += ("IVRS_DOB_DAY" -> (record \ "IVRS_DOB_DAY").as[String])
-    //            mongoRecord += ("IVRS_DOB_MONTH" -> (record \ "IVRS_DOB_MONTH").as[String])
-    //            mongoRecord += ("IVRS_DOB_YEAR" -> (record \ "IVRS_DOB_YEAR").as[String])
-    //            mongoRecord += ("IVRS_PATIENT_F_INITIAL" -> (record \ "IVRS_PATIENT_F_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_PATIENT_M_INITIAL" -> (record \ "IVRS_PATIENT_M_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_PATIENT_L_INITIAL" -> (record \ "IVRS_PATIENT_L_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_INVESTIGATOR_F_INITIAL" -> (record \ "IVRS_INVESTIGATOR_F_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_INVESTIGATOR_M_INITIAL" -> (record \ "IVRS_INVESTIGATOR_M_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_INVESTIGATOR_L_INITIAL" -> (record \ "IVRS_INVESTIGATOR_L_INITIAL").as[String])
-    //            mongoRecord += ("IVRS_GENDER" -> (record \ "IVRS_GENDER").as[String])
-    //            mongoRecord += ("IVRS_DATE_SCREENED" -> (record \ "IVRS_DATE_SCREENED").as[String])
-    //            mongoRecord += ("IVRS_DATE_SCREEN_FAILED" -> (record \ "IVRS_DATE_SCREEN_FAILED").as[String])
-    //            mongoRecord += ("IVRS_DATE_RANDOMIZED" -> (record \ "IVRS_DATE_RANDOMIZED").as[String])
-    //            mongoRecord += ("IVRS_DATE_COMPLETED" -> (record \ "IVRS_DATE_COMPLETED").as[String])
-    //            mongoRecord += ("IVRS_DATE_RE_SCREENED" -> (record \ "IVRS_DATE_RE_SCREENED").as[String])
-    //            mongoRecord += ("IVRS_DATE_PRE_SCREENED" -> (record \ "IVRS_DATE_PRE_SCREENED").as[String])
-    //            mongoRecord += ("IVRS_DATE_RANDOMIZATION_FAILED" -> (record \ "IVRS_DATE_RANDOMIZATION_FAILED").as[String])
-    //            mongoRecord += ("IVRS_DATE_PRE_SCREEN_FAILED" -> (record \ "IVRS_DATE_PRE_SCREEN_FAILED").as[String])
-    //            mongoRecord += ("IVRS_DATE_ENROLLMENT" -> (record \ "IVRS_DATE_ENROLLMENT").as[String])
-    //            mongoRecord += ("IVRS_DATE_DROPOUT" -> (record \ "IVRS_DATE_DROPOUT").as[String])
-    //            mongoRecord += ("IVRS_REGION" -> (record \ "IVRS_REGION").as[String])
-    //            mongoRecord += ("IVRS_COUNTRY" -> (record \ "IVRS_COUNTRY").as[String])
-    //            mongoRecord += ("IVRS_PROTOCOL_NUMBER" -> (record \ "IVRS_PROTOCOL_NUMBER").as[String])
-    //            mongoRecord += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
-    //            mongoRecord += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
-    //
-    //            mongoConnn.updateAcurianStagingRecord("test", "acurianstagings", mongoRecord, (record \ "IVRS_PATIENT_ID").as[String],
-    //              (record \ "IVRS_PROTOCOL_NUMBER").as[String],
-    //              (record \ "IVRS_PROJECT_ID").as[String],
-    //              (record \ "IVRS_COUNTRY").as[String])
-    //            matched
-    //          } else {
-    //            Row.fromSeq(Seq.empty)
-    //          }
-    //        }
-    //      })
-    //    }).filter(_.size > 0), rulesAppliedSchema)
-    //      .persist()
-    //      .createOrReplaceTempView("rankedData")
+    //    matches.createOrReplaceTempView("rankedData")
+    dumpForDashboard(rawRanks, "allcomparisons")
+    dumpForDashboard(matches, "allcomparisons")
+    sql.applySchema(matches.rdd.mapPartitions(partition => {
+      val mongoConnn = new MongoDBConnector
+      mongoConnn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
+
+      partition.map(matched => {
+
+        val matchCheck = mongoConnn.getRecordsByKeys(Constants.PROCESS_MONGO_DB_NAME, Constants.ACURIAN_STAGING,
+          matched.getAs[String]("acurian_patient_id"),
+          matched.getAs[String]("acurian_consented_protocol"),
+          matched.getAs[String]("acurian_project_id"),
+          matched.getAs[String]("ivrs_country"))
+
+        if (matchCheck == "") {
+          matched
+        } else {
+          val record = Json.parse(matchCheck)
+          val matchRank = matched.getAs[Int]("system_rank")
+          if (matchCheck != "" &&
+            (record \ "ACURIAN_PROJECT_ID").as[String] != (record \ "IVRS_PROJECT_ID").as[String] &&
+            (record \ "SYSTEM_RANK").as[String].toInt > matchRank &&
+            (record \ "CONFIRMATION_METHOD_CD").as[String].equals("2")) {
+
+            var mongoRecord = scala.collection.immutable.Map.empty[String, Any]
+            mongoRecord += ("IVRS_PATIENT_ID" -> (record \ "IVRS_PATIENT_ID").as[String])
+            mongoRecord += ("IVRS_DOB_DAY" -> (record \ "IVRS_DOB_DAY").as[String])
+            mongoRecord += ("IVRS_DOB_MONTH" -> (record \ "IVRS_DOB_MONTH").as[String])
+            mongoRecord += ("IVRS_DOB_YEAR" -> (record \ "IVRS_DOB_YEAR").as[String])
+            mongoRecord += ("IVRS_PATIENT_F_INITIAL" -> (record \ "IVRS_PATIENT_F_INITIAL").as[String])
+            mongoRecord += ("IVRS_PATIENT_M_INITIAL" -> (record \ "IVRS_PATIENT_M_INITIAL").as[String])
+            mongoRecord += ("IVRS_PATIENT_L_INITIAL" -> (record \ "IVRS_PATIENT_L_INITIAL").as[String])
+            mongoRecord += ("IVRS_INVESTIGATOR_F_INITIAL" -> (record \ "IVRS_INVESTIGATOR_F_INITIAL").as[String])
+            mongoRecord += ("IVRS_INVESTIGATOR_M_INITIAL" -> (record \ "IVRS_INVESTIGATOR_M_INITIAL").as[String])
+            mongoRecord += ("IVRS_INVESTIGATOR_L_INITIAL" -> (record \ "IVRS_INVESTIGATOR_L_INITIAL").as[String])
+            mongoRecord += ("IVRS_GENDER" -> (record \ "IVRS_GENDER").as[String])
+            mongoRecord += ("IVRS_DATE_SCREENED" -> (record \ "IVRS_DATE_SCREENED").as[String])
+            mongoRecord += ("IVRS_DATE_SCREEN_FAILED" -> (record \ "IVRS_DATE_SCREEN_FAILED").as[String])
+            mongoRecord += ("IVRS_DATE_RANDOMIZED" -> (record \ "IVRS_DATE_RANDOMIZED").as[String])
+            mongoRecord += ("IVRS_DATE_COMPLETED" -> (record \ "IVRS_DATE_COMPLETED").as[String])
+            mongoRecord += ("IVRS_DATE_RE_SCREENED" -> (record \ "IVRS_DATE_RE_SCREENED").as[String])
+            mongoRecord += ("IVRS_DATE_PRE_SCREENED" -> (record \ "IVRS_DATE_PRE_SCREENED").as[String])
+            mongoRecord += ("IVRS_DATE_RANDOMIZATION_FAILED" -> (record \ "IVRS_DATE_RANDOMIZATION_FAILED").as[String])
+            mongoRecord += ("IVRS_DATE_PRE_SCREEN_FAILED" -> (record \ "IVRS_DATE_PRE_SCREEN_FAILED").as[String])
+            mongoRecord += ("IVRS_DATE_ENROLLMENT" -> (record \ "IVRS_DATE_ENROLLMENT").as[String])
+            mongoRecord += ("IVRS_DATE_DROPOUT" -> (record \ "IVRS_DATE_DROPOUT").as[String])
+            mongoRecord += ("IVRS_REGION" -> (record \ "IVRS_REGION").as[String])
+            mongoRecord += ("IVRS_COUNTRY" -> (record \ "IVRS_COUNTRY").as[String])
+            mongoRecord += ("IVRS_PROTOCOL_NUMBER" -> (record \ "IVRS_PROTOCOL_NUMBER").as[String])
+            mongoRecord += ("IVRS_SITE_ID" -> (record \ "IVRS_SITE_ID").as[String])
+            mongoRecord += ("IVRS_PROJECT_ID" -> (record \ "IVRS_PROJECT_ID").as[String])
+
+            mongoConnn.updateAcurianStagingRecord("test", "acurianstagings", mongoRecord, (record \ "IVRS_PATIENT_ID").as[String],
+              (record \ "IVRS_PROTOCOL_NUMBER").as[String],
+              (record \ "IVRS_PROJECT_ID").as[String],
+              (record \ "IVRS_COUNTRY").as[String])
+            matched
+          } else {
+            Row.fromSeq(Seq.empty)
+          }
+        }
+      })
+    }).filter(_.size > 0), rulesAppliedSchema)
+      .persist()
+      .createOrReplaceTempView("rankedData")
 
     val exactMatches = sql.sql(s"""
          SELECT acurian_screening_id as ACURIAN_SSID,
@@ -254,7 +254,7 @@ object RmSpike {
 
     val ranksApplied = sql.sql("""
         SELECT * 
-        FROM toRemoveCrossStudy 
+        FROM table 
         WHERE
         ivrs_patient_id IN (SELECT ivrs_patient_id 
                              FROM toRemoveCrossStudy 
