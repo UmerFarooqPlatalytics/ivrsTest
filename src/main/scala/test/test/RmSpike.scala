@@ -115,7 +115,7 @@ object RmSpike {
     val matches = rawRanks.filter(rawRanks("system_rank") < 5000).persist(StorageLevel.MEMORY_AND_DISK_SER)
     matches.createOrReplaceTempView("rankedData")
     //dumpForDashboard(rawRanks, "allcomparisons")
-    dumpForDashboard(matches, "allcomparisons")
+    //dumpForDashboard(matches, "allcomparisons")
     //    sql.applySchema(matches.rdd.mapPartitions(partition => {
     //      val mongoConnn = new MongoDBConnector
     //      mongoConnn.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
@@ -253,16 +253,12 @@ object RmSpike {
       """).createOrReplaceTempView("toRemoveCrossStudy")
 
     val ranksApplied = sql.sql("""
-        SELECT * 
-        FROM toRemoveCrossStudy 
-        WHERE
-        ivrs_patient_id IN (SELECT ivrs_patient_id 
-                             FROM toRemoveCrossStudy 
-                             GROUP BY ivrs_patient_id
-                             HAVING SUM(CASE WHEN ivrs_project_id = acurian_project_id
-                                             THEN 1 ELSE 0 END) = 0)
-        OR 
-        ivrs_project_id = acurian_project_id
+        Select * from toRemoveCrossStudy group by ivrs_patient_Id having count(*) = 1
+        Union
+        with cte as(
+        Select * from toRemoveCrossStudy group by ivrs_patient_Id having count(*) > 1), cte2
+        (select * from cte where 
+        ivrs_project_id = acurian_project_id)
         """)
 
     //    ranksApplied.filter(ranksApplied("system_rank") !== 0).take(100).foreach(println)
