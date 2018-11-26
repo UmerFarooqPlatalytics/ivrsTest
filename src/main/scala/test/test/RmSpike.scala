@@ -553,7 +553,7 @@ object RmSpike {
     """
 
     var facMap = scala.collection.immutable.Map.empty[String, String]
-    val facilityDf = sql.read.jdbc(url, facilityQuery, prop).rdd.
+    val facilityDf = sql.read.jdbc(url, facilityQuery, prop).rdd.collect.
       foreach(record => {
         if (record.getAs[String](1) != null && record.getAs[String](0) != null)
           facMap += (record.getAs[String](1) -> record.getAs[String](0))
