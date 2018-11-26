@@ -559,6 +559,11 @@ object RmSpike {
           facMap += (record.getAs[String](1) -> record.getAs[String](0))
       })
 
+    println("===============FACILITY MAP================")
+    sql.read.jdbc(url, facilityQuery, prop).show
+    println(facMap)
+    println("===============FACILITY MAP================")
+
     val jsonValue = Json.parse(schemaMapping)
 
     val fileSchema = (jsonValue \ "file_schema").as[Map[String, JsValue]] //.toSeq

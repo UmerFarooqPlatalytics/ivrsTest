@@ -22,70 +22,81 @@ import org.apache.spark.sql.types.DecimalType
  * @author ${user.name}
  */
 object App {
-  val sparkSession = SparkSession.builder
-    .master("local[*]").appName("test").getOrCreate
-  //  var dinput: DataInput = _
+//  val sparkSession = SparkSession.builder
+//    .master("local[*]").appName("test").getOrCreate
+//  //  var dinput: DataInput = _
   def main(args: Array[String]) {
-    
-    import sparkSession.sqlContext.implicits._
-    val df = sparkSession.sparkContext.parallelize(Array((1, 2), (3, 4), (1, 6))).toDF("age", "salary")
-    val df2 = sparkSession.sparkContext.parallelize(Array(("a", "b"), ("c", "d"), ("e", "f"))).toDF("age", "salary")
-    
-    val broadCasted = sparkSession.sparkContext.broadcast(df2)
-    
-    val bb = df.rdd.map(record => {
-      val t = broadCasted.value
-      t.rdd.collect()(0)
-    })
-    
-    bb.foreach(println)
-    
-//    val t = df.select(df("age")).distinct.collect.map(_.toSeq.mkString).mkString(",")
-//    println(t)
-    
-    
-//    sparkSession.sqlContext.read
-//      .format("com.databricks.spark.csv")
-//      .option("inferSchema", "false")
-//      .option("header", "true")
-//      .option("delimiter", ",")
-//      .load("file:///C:/Users/umer/Downloads/3017-M16_100-US-20180828.csv").show
 
-//    val mongoCon = new MongoDBConnector
-//    mongoCon.connect("172.16.248.23", "9876")
-//    val project = Json.parse(mongoCon.getRecordsByKey("test", "projects", "project_id", "4579"))
-//    val projectStartDate = (project \ "project_start_date") //.as[DateTime]
-//    //val ivrsRunStartDate = (project \ "ivrs_run_start_date").as[String]
-//
-//    //val t = mongoCon.getCollection(null, "acurianstagings")
-//    //println(t.size)
-//    println(projectStartDate.get.toString.split("T")(0).drop(10))
-//
-//    //    val conf: Configuration = new Configuration()
-//    //    conf.set("fs.defaultFS", "ds-node1:9000")
-//    //
-//    //    var filePath = s"/user/plat/files/ivrsData/4579-JZP166_201-US-20180719.xlsx"
-//    //    val rdd = convertToRdd(conf, "hdfs://ds-node1.acurian.com:9000" + filePath, 0)
-//    //    println(rdd.count)
-//
-//    val t = Seq(Row.fromSeq(Seq("JZP166_201", "4579", java.math.BigDecimal.valueOf(123.0), "US")))
-//    //
-//    val data = sparkSession.sparkContext.parallelize(t)
-//    val schema = new StructType()
-//      .add(StructField("ivrs_protocol_number", StringType, true))
-//      .add(StructField("ivrs_project_id", StringType, true))
-//      .add(StructField("ivrs_patient_id", DecimalType(38, 10), true))
-//      .add(StructField("ivrs_country", StringType, true))
-//    val dataFrame = sparkSession.sqlContext.applySchema(data, schema)
-//
-//    var i = 0
-//
-//   val h = sparkSession.sparkContext.broadcast(dataFrame.rdd.collect)
-//   
-//   val j = dataFrame.rdd.flatMap(r => {
-//     h.value
-//   }).collect.foreach(println)
-//   
+    val jsonString = """
+  {
+    "url": "imap.yahoo.com",
+    "username": "myusername",
+    "password": "mypassword"
+  }
+  """
+
+    val parsed = Json.parse(jsonString)
+
+    println((parsed \ "url").as[String])
+
+    //    import sparkSession.sqlContext.implicits._
+    //    val df = sparkSession.sparkContext.parallelize(Array((1, 2), (3, 4), (1, 6))).toDF("age", "salary")
+    //    val df2 = sparkSession.sparkContext.parallelize(Array(("a", "b"), ("c", "d"), ("e", "f"))).toDF("age", "salary")
+    //    
+    //    val broadCasted = sparkSession.sparkContext.broadcast(df2)
+    //    
+    //    val bb = df.rdd.map(record => {
+    //      val t = broadCasted.value
+    //      t.rdd.collect()(0)
+    //    })
+    //    
+    //    bb.foreach(println)
+
+    //    val t = df.select(df("age")).distinct.collect.map(_.toSeq.mkString).mkString(",")
+    //    println(t)
+
+    //    sparkSession.sqlContext.read
+    //      .format("com.databricks.spark.csv")
+    //      .option("inferSchema", "false")
+    //      .option("header", "true")
+    //      .option("delimiter", ",")
+    //      .load("file:///C:/Users/umer/Downloads/3017-M16_100-US-20180828.csv").show
+
+    //    val mongoCon = new MongoDBConnector
+    //    mongoCon.connect("172.16.248.23", "9876")
+    //    val project = Json.parse(mongoCon.getRecordsByKey("test", "projects", "project_id", "4579"))
+    //    val projectStartDate = (project \ "project_start_date") //.as[DateTime]
+    //    //val ivrsRunStartDate = (project \ "ivrs_run_start_date").as[String]
+    //
+    //    //val t = mongoCon.getCollection(null, "acurianstagings")
+    //    //println(t.size)
+    //    println(projectStartDate.get.toString.split("T")(0).drop(10))
+    //
+    //    //    val conf: Configuration = new Configuration()
+    //    //    conf.set("fs.defaultFS", "ds-node1:9000")
+    //    //
+    //    //    var filePath = s"/user/plat/files/ivrsData/4579-JZP166_201-US-20180719.xlsx"
+    //    //    val rdd = convertToRdd(conf, "hdfs://ds-node1.acurian.com:9000" + filePath, 0)
+    //    //    println(rdd.count)
+    //
+    //    val t = Seq(Row.fromSeq(Seq("JZP166_201", "4579", java.math.BigDecimal.valueOf(123.0), "US")))
+    //    //
+    //    val data = sparkSession.sparkContext.parallelize(t)
+    //    val schema = new StructType()
+    //      .add(StructField("ivrs_protocol_number", StringType, true))
+    //      .add(StructField("ivrs_project_id", StringType, true))
+    //      .add(StructField("ivrs_patient_id", DecimalType(38, 10), true))
+    //      .add(StructField("ivrs_country", StringType, true))
+    //    val dataFrame = sparkSession.sqlContext.applySchema(data, schema)
+    //
+    //    var i = 0
+    //
+    //   val h = sparkSession.sparkContext.broadcast(dataFrame.rdd.collect)
+    //   
+    //   val j = dataFrame.rdd.flatMap(r => {
+    //     h.value
+    //   }).collect.foreach(println)
+    //   
 
     //    dataFrame.rdd.foreach ( row => {
     //      println(row.getAs[java.math.BigDecimal]("ivrs_patient_id").toString.split('.')(0))
