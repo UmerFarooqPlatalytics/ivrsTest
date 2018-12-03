@@ -1326,7 +1326,9 @@ object RmSpike {
       if (oneToOneFieldsMap.keys.toSeq.contains("country")) {
         country = row.getAs[String](oneToOneFieldsMap.get("country").get)
         println("================")
-        println(country)
+        println(s"--${country}--")
+        println((countries \ oneToOneFieldsMap.get("country").get).asOpt[String])
+        println("================")
         if (country != null)
           if (country.length > 2) {
             if ((countries \ oneToOneFieldsMap.get("country").get).asOpt[String] == None) {
