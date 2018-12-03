@@ -22,22 +22,41 @@ import org.apache.spark.sql.types.DecimalType
  * @author ${user.name}
  */
 object App {
-//  val sparkSession = SparkSession.builder
-//    .master("local[*]").appName("test").getOrCreate
-//  //  var dinput: DataInput = _
+  //  val sparkSession = SparkSession.builder
+  //    .master("local[*]").appName("test").getOrCreate
+  //  //  var dinput: DataInput = _
   def main(args: Array[String]) {
 
-    val jsonString = """
-  {
-    "url": "imap.yahoo.com",
-    "username": "myusername",
-    "password": "mypassword"
-  }
-  """
+    val mongoCon = new MongoDBConnector
+    mongoCon.connect("192.168.23.108", "9876")
 
-    val parsed = Json.parse(jsonString)
+    val country = mongoCon.getCollection("test", "countries")
+    var stocks = country.find
+    val t = Json.parse(stocks.one.toString)
+    println((t \ "pako").asOpt[String])
+    //    var countriesMap = scala.collection.immutable.Map.empty[String, String]
+    //    stocks.foreach {
+    //      e =>
+    //        val jsonString = e.toString()
+    //        println("jsonString " + jsonString)
+    //        val parsed = play.api.libs.json.Json.parse(jsonString)
+    //        println("parsed: " + parsed)
+    //        println(parsed("Afghanistan").as[String])
+    //        println(parsed("Albania").as[String])
+    //        println(parsed("Algeria").as[String])
+    //    }
 
-    println((parsed \ "url").as[String])
+    //    val jsonString = """
+    //  {
+    //    "url": "imap.yahoo.com",
+    //    "username": "myusername",
+    //    "password": "mypassword"
+    //  }
+    //  """
+    //
+    //    val parsed = Json.parse(jsonString)
+    //
+    //    println((parsed \ "url").as[String])
 
     //    import sparkSession.sqlContext.implicits._
     //    val df = sparkSession.sparkContext.parallelize(Array((1, 2), (3, 4), (1, 6))).toDF("age", "salary")
