@@ -1320,24 +1320,23 @@ object RmSpike {
       if (oneToOneFieldsMap.keys.toSeq.contains("country")) {
         country = row.getAs[String](oneToOneFieldsMap.get("country").get)
         println("======")
-        val temp = country.replace(".", "_")
         println(country.replace(".", "_"))
         println((countries \ country.replace(".", "_")).asOpt[String])
         
         if (country != null)
           if (country.length > 2) {
-            if ((countries \ country.replaceAll(".", "_")).asOpt[String] == None) {
+            if ((countries \ country.replace(".", "_")).asOpt[String] == None) {
               throw new Exception(s"Country: ${country} is not a valid country")
             } else
-              country = (countries \ country.replaceAll(".", "_")).asOpt[String].get
+              country = (countries \ country.replace(".", "_")).asOpt[String].get
           }
       } else {
         country = forcedValuesMap.get("country").get
         if (country.length > 2) {
-          if ((countries \ country.replaceAll(".", "_")).asOpt[String] == None) {
+          if ((countries \ country.replace(".", "_")).asOpt[String] == None) {
             throw new Exception(s"Country: ${country} is not a valid country")
           } else
-            country = (countries \ country.replaceAll(".", "_")).asOpt[String].get
+            country = (countries \ country.replace(".", "_")).asOpt[String].get
         }
       }
 
