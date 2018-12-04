@@ -251,9 +251,9 @@ object Constants {
   var FRONTEND_HOST: String = null
 
   /** process stages **/
-  var PROCESS_MONGO_IP: String = "172.16.248.25"
+  //var PROCESS_MONGO_IP: String = "172.16.248.25"
   //var PROCESS_MONGO_IP: String = "172.16.248.23"
-  //var PROCESS_MONGO_IP: String = "ds-dev-node-04.acurian.com"
+  var PROCESS_MONGO_IP: String = "ds-dev-node-04.acurian.com"
   var PROCESS_MONGO_PORT: String = "9876"
   var PROCESS_MONGO_DB_NAME: String = "test"
   val PROCESS_MONGO_COLLECTION_NAME_APPLICATION: String = "applications"

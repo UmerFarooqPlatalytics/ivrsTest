@@ -47,8 +47,8 @@ object RmSpike {
   val mongoCon = new MongoDBConnector
   mongoCon.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
   //val hdfsPath = "hdfs://ds-node1:9000"
-  val hdfsPath = "hdfs://ds-node6:9000"
-  //val hdfsPath = "hdfs://ds-dev-node-01:9000"
+  //val hdfsPath = "hdfs://ds-node6:9000"
+  val hdfsPath = "hdfs://ds-dev-node-01:9000"
 
   def main(args: Array[String]) {
     run("4385OUS-MVT_601_3101-OUS-20181128.csv", 2)
