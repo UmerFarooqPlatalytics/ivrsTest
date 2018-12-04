@@ -1320,8 +1320,9 @@ object RmSpike {
       if (oneToOneFieldsMap.keys.toSeq.contains("country")) {
         country = row.getAs[String](oneToOneFieldsMap.get("country").get)
         println("======")
-        println(country.replaceAll(".", "_"))
-        println((countries \ country.replaceAll(".", "_")).asOpt[String])
+        val temp = country.replace(".", "_")
+        println(country.replace(".", "_"))
+        println((countries \ country.replace(".", "_")).asOpt[String])
         
         if (country != null)
           if (country.length > 2) {
