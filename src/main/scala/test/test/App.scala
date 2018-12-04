@@ -28,12 +28,12 @@ object App {
   def main(args: Array[String]) {
 
     val mongoCon = new MongoDBConnector
-    mongoCon.connect("192.168.23.108", "9876")
+    mongoCon.connect("ds-dev-node-04.acurian.com", "9876")
 
     val country = mongoCon.getCollection("test", "countries")
     var stocks = country.find
     val t = Json.parse(stocks.one.toString)
-    println((t \ "pako").asOpt[String])
+    println(t)
     //    var countriesMap = scala.collection.immutable.Map.empty[String, String]
     //    stocks.foreach {
     //      e =>

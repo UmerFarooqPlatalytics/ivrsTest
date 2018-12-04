@@ -47,11 +47,11 @@ object RmSpike {
   val mongoCon = new MongoDBConnector
   mongoCon.connect(Constants.PROCESS_MONGO_IP, Constants.PROCESS_MONGO_PORT)
   //val hdfsPath = "hdfs://ds-node1:9000"
-  //val hdfsPath = "hdfs://ds-node6:9000"
-  val hdfsPath = "hdfs://ds-dev-node-01:9000"
+  val hdfsPath = "hdfs://ds-node6:9000"
+  //val hdfsPath = "hdfs://ds-dev-node-01:9000"
 
   def main(args: Array[String]) {
-    run("4385OUS-MVT_601_3101-OUS-20181125.csv", 2)
+    run("4385OUS-MVT_601_3101-OUS-20181128.csv", 2)
   }
 
   def run(ivrsFileName: String, headerLines: Int): DataFrame = {
@@ -1305,12 +1305,6 @@ object RmSpike {
       var gender: String = null
       var siteID: String = null
 
-      var countryCodes = Map.empty[String, String]
-      Locale.getISOCountries.foreach(x => {
-        val l = new Locale("", x)
-        countryCodes += (l.getDisplayCountry -> x)
-      })
-
       if (oneToOneFieldsMap.keys.toSeq.contains("protocol_number")) {
         protocolNumber = row.getAs[String](oneToOneFieldsMap.get("protocol_number").get)
       } else {
@@ -1325,26 +1319,24 @@ object RmSpike {
 
       if (oneToOneFieldsMap.keys.toSeq.contains("country")) {
         country = row.getAs[String](oneToOneFieldsMap.get("country").get)
-        println("================")
-        println(s"--${row.getAs[String](oneToOneFieldsMap.get("country").get)}--")
-        println(countries)
-        println((countries \ row.getAs[String](oneToOneFieldsMap.get("country").get)).asOpt[String].get)
-        println((countries \ oneToOneFieldsMap.get("country").get).asOpt[String])
-        println("================")
+        println("======")
+        println(country.replaceAll(".", "_"))
+        println((countries \ country.replaceAll(".", "_")).asOpt[String])
+        
         if (country != null)
           if (country.length > 2) {
-            if ((countries \ oneToOneFieldsMap.get("country").get).asOpt[String] == None) {
+            if ((countries \ country.replaceAll(".", "_")).asOpt[String] == None) {
               throw new Exception(s"Country: ${country} is not a valid country")
             } else
-              country = (countries \ oneToOneFieldsMap.get("country").get).asOpt[String].get
+              country = (countries \ country.replaceAll(".", "_")).asOpt[String].get
           }
       } else {
         country = forcedValuesMap.get("country").get
         if (country.length > 2) {
-          if ((countries \ oneToOneFieldsMap.get("country").get).asOpt[String] == None) {
+          if ((countries \ country.replaceAll(".", "_")).asOpt[String] == None) {
             throw new Exception(s"Country: ${country} is not a valid country")
           } else
-            country = (countries \ oneToOneFieldsMap.get("country").get).asOpt[String].get
+            country = (countries \ country.replaceAll(".", "_")).asOpt[String].get
         }
       }
 
